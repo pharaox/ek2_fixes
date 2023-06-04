@@ -129,15 +129,6 @@ declare_war_interaction = {
 	on_accept = {
 
 		scope:actor = {
-			#if writ of war is used, remove the writ of war
-			if = {
-				limit = { 
-					has_character_flag = has_writ_of_war
-					scope:recipient = { is_in_morrowind_council = yes }
-				}
-				remove_character_flag = has_writ_of_war
-			}
-
 			#Feedback!
 			hidden_effect = {
 				send_interface_toast = {
