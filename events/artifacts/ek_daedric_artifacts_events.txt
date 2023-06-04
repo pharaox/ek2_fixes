@@ -1,0 +1,4618 @@
+﻿namespace = ek_daedric_artifacts
+# Events related to Elder Kings daedric artifacts #
+
+# The Power of the Rose
+ek_daedric_artifacts.0001 = {
+	type = character_event
+	title = ek_daedric_artifacts.0001.t
+	desc = ek_daedric_artifacts.0001.desc
+	theme = feast_activity
+	override_background = {
+		event_background = bedchamber
+	}
+
+	left_portrait = {
+		character = root
+		animation = ecstasy
+	}
+
+	right_portrait = {
+		character = scope:daedric_guest
+	}
+
+	artifact = {
+		target = scope:sanguine_rose
+		position = lower_left_portrait
+		trigger = { exists = scope:sanguine_rose }
+	}
+
+	immediate = {
+		every_character_artifact = {
+			limit = { has_artifact_modifier = staff_sanguine_modifier }
+			save_scope_as = sanguine_rose
+		}
+		add_character_flag = rose_summoned
+		if = {
+			limit = {
+				NOT = { has_variable = rose_uses }
+			}
+			set_variable = {
+				name = rose_uses
+				value = 1
+			}
+		}
+		else = {
+			random_list = {
+				0 = {
+					modifier = {
+						add = var:rose_uses
+					}
+					destroy_artifact = scope:sanguine_rose
+					remove_variable = rose_uses
+					remove_trait = champion_sanguine
+				}
+				5 = {
+					change_variable = {
+						name = rose_uses
+						add = 1
+					}
+					trigger_event = {
+						id = ek_daedric_artifacts.0002
+						years = { 2 5 }
+					}
+				}
+			}
+		}
+		create_character = {
+			template = dremora_guevenne_template
+			location = root.capital_province
+			save_scope_as = daedric_guest
+		}
+		scope:daedric_guest = {
+			add_character_flag = summoned_daedra
+			add_opinion = {
+				target = prev
+				modifier = thrall_opinion
+			}
+		}
+		add_hook = {
+			type = loyalty_hook
+			target = scope:daedric_guest
+		}
+	}
+
+	option = {
+		name = ek_daedric_artifacts.0001.a
+		add_courtier = scope:daedric_guest
+		trigger_event = {
+			id = ek_daedric_artifacts.0002
+			years = { 2 5 }
+		}
+	}
+}
+
+# A Silence in the Halls
+ek_daedric_artifacts.0002 = {
+	type = character_event
+	title = ek_daedric_artifacts.0001.t
+	desc = ek_daedric_artifacts.0002.desc
+	theme = feast_activity
+
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:daedric_guest
+	}
+
+	override_background = {
+		event_background = bedchamber
+	}
+
+	artifact = {
+		target = scope:sanguine_rose
+		position = lower_left_portrait
+		trigger = { exists = scope:sanguine_rose }
+	}
+
+	immediate = {
+		every_character_artifact = {
+			limit = { has_artifact_modifier = staff_sanguine_modifier }
+			save_scope_as = sanguine_rose
+		}
+		every_courtier = {
+			limit = { has_character_flag = summoned_daedra }
+			save_scope_as = daedric_guest
+		}
+	}
+
+	option = {
+		trigger = {
+			any_character_artifact = { 
+				has_artifact_modifier = staff_sanguine_modifier
+			}
+		}
+		custom_tooltip = ek_daedric_artifacts.0002.risk
+		name = ek_daedric_artifacts.0002.a
+		random_list = {
+			0 = {
+				modifier = {
+					add = var:rose_uses
+				}
+				scope:sanguine_rose = {
+					destroy_artifact = this 
+				}
+				remove_trait = champion_sanguine
+				remove_variable = rose_uses
+			}
+			5 = {
+				change_variable = {
+					name = rose_uses
+					add = 1
+				}
+				trigger_event = {
+					id = ek_daedric_artifacts.0002
+					years = { 2 5 }
+				}
+			}
+		}
+	}
+
+	option = {
+		name = ek_daedric_artifacts.0002.b
+		remove_character_flag = rose_summoned
+		scope:daedric_guest = { silent_disappearance_effect = yes }
+	}
+}
+
+# A Peculiar Bow
+ek_daedric_artifacts.0003 = {
+	type = character_event
+	title = ek_daedric_artifacts.0003.t
+	desc = ek_daedric_artifacts.0003.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bow_shadows
+		position = lower_left_portrait
+		trigger = { exists = scope:bow_shadows }
+	}
+
+	theme = secret
+
+	trigger = {
+		can_secretly_worship_nocturnal = yes
+		OR = {
+		intrigue > 10
+		has_focus = intrigue_skulduggery_focus
+		has_character_modifier = nocturnals_attention
+		}
+	}
+
+	option = { # as you wish
+		name = ek_daedric_artifacts.0003.a
+		add_prestige = medium_prestige_loss
+		add_piety = medium_piety_loss
+		give_nocturnal_worshipper_secret_or_trait_effect = yes
+		if = {
+			limit = { 
+				any_artifact = {
+					count < 1
+					has_artifact_modifier = bow_shadows_modifier
+				}	
+			}
+			create_artifact_bow_shadows_effect = { OWNER = ROOT }
+		}
+	}
+
+	option = { #make a deal
+		name = ek_daedric_artifacts.0003.c
+		trigger = { stewardship > 10 }
+		add_piety = minor_piety_loss
+		custom_tooltip = ek_daedric_artifacts.0003.c.tt.success.ct
+		duel = {
+			skill = stewardship
+			value = 10
+			25 = {
+				compare_modifier = {
+					value = {
+						value = scope:duel_value
+						if = {
+							limit = { has_trait = greedy }
+							add = 2
+						}
+						if = {
+							limit = { has_trait = generous }
+							add = -2
+						}
+						if = {
+							limit = { has_trait = education_stewardship_2 }
+							add = 0.5
+						}
+						if = {
+							limit = { has_trait = education_stewardship_3 }
+							add = 0.75
+						}
+						if = {
+							limit = { has_trait = education_stewardship_4 }
+							add = 1
+						}
+						if = {
+							limit = { has_trait = avaricious }
+							add = 1
+						}
+						if = {
+							limit = { has_trait = administrator }
+							add = 0.5
+						}
+						if = {
+							limit = { has_trait = patient }
+							add = 0.5
+						}
+						if = {
+							limit = { has_trait = impatient }
+							add = -0.5
+						}
+						if = {
+							limit = { has_trait = humble }
+							add = -1
+						}
+						if = {
+							limit = { has_trait = arrogant }
+							add = 0.5
+						}
+						if = {
+							limit = { has_trait = shy }
+							add = -2
+						}
+						if = {
+							limit = { has_trait = compassionate }
+							add = -1
+						}
+						if = {
+							limit = { has_trait = honest }
+							add = -1
+						}
+						if = {
+							limit = { has_trait = deceitful }
+							add = 2
+						}
+						if = {
+							limit = { has_trait = stubborn }
+							add = 3
+						}
+					}
+					multiplier = 2
+					min = -30
+					max = 30
+				}
+				desc = ek_daedric_artifacts.0003.c.tt.success
+				send_interface_toast = {
+					title = ek_daedric_artifacts.0003.c.tt.success
+					add_prestige = minor_prestige_gain
+					remove_short_term_gold = medium_gold_value
+				}
+			}
+			30 = {
+				compare_modifier = {
+					value = scope:duel_value
+					min = -30
+					max = 30
+				}
+				desc = ek_daedric_artifacts.0003.c.tt.failure
+				send_interface_toast = {
+					title = ek_daedric_artifacts.0003.c.tt.failure
+					add_prestige = medium_prestige_loss
+					add_character_modifier = nocturnals_wrath
+					add_character_flag = make_suicide_available
+				}
+			}
+		}
+	}
+
+	option = { # never!
+		name = ek_feast.0003.b
+		custom_tooltip = ek_daedric_artifacts.0003.c.tt.success.cd
+		add_prestige = medium_prestige_loss
+		add_piety = minor_piety_gain
+		add_character_modifier = nocturnals_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+# meridia asks for you to find dawnbreaker
+ek_daedric_artifacts.0004 = {
+	type = character_event
+	title = ek_daedric_artifacts.0004.t
+	desc = ek_daedric_artifacts.0004.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:meridias_beacon
+		position = lower_left_portrait
+		trigger = { exists = scope:meridias_beacon }
+	}
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 0.2
+			has_trait = diligent
+		}
+		modifier = {
+			add = 0.2
+			has_trait = brave
+		}
+		modifier = {
+			add = 0.2
+			has_trait = zealous
+		}
+		modifier = {
+			add = -0.2
+			has_trait = craven
+		}
+		modifier = {
+			add = -0.2
+			has_trait = lazy
+		}
+		modifier = {
+			add = -0.2
+			has_trait = cynical
+		}
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		any_equipped_character_artifact = {
+			has_artifact_modifier = meridias_beacon_modifier
+		}
+		can_secretly_worship_meridia = yes
+		is_daedric_champion = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = dawnbreaker_modifier
+		}
+	}
+
+	theme = faith
+
+	option = { # as you wish
+		name = ek_daedric_artifacts.0004.a
+		add_piety = medium_piety_loss
+		remove_short_term_gold = medium_gold_value
+		give_meridia_worshipper_secret_or_trait_effect = yes
+		trigger_event = {
+			id = ek_daedric_artifacts.0005
+			days = { 15 30 }
+		}
+	}
+
+	option = { # oh, sure, sure
+		name = ek_daedric_artifacts.0004.c
+		trigger = { intrigue > 10 }
+		add_piety = minor_piety_gain
+		duel = {
+			skill = intrigue
+			value = 25
+			25 = {
+				compare_modifier = {
+					value = {
+						value = scope:duel_value
+					}
+					multiplier = 2
+					min = -30
+					max = 30
+				}
+				desc = ek_daedric_artifacts.0004.c.tt.success
+				send_interface_toast = {
+					title = ek_daedric_artifacts.0004.c.tt.success
+					add_piety = minor_piety_gain
+					remove_short_term_gold = medium_gold_value
+					destroy_artifact = scope:meridias_beacon
+				}
+			}
+			30 = {
+				compare_modifier = {
+					value = scope:duel_value
+					min = -30
+					max = 30
+				}
+				desc = ek_daedric_artifacts.0004.c.tt.failure
+				send_interface_toast = {
+					title = ek_daedric_artifacts.0004.c.tt.failure
+					add_piety = minor_piety_gain
+					remove_short_term_gold = medium_gold_value
+					add_character_modifier = meridias_wrath
+					add_character_flag = make_suicide_available
+				}
+			}
+		}
+	}
+
+	option = { # hell no
+		name = ek_daedric_artifacts.0004.b
+		add_prestige = medium_prestige_loss
+		add_piety = minor_piety_gain
+		add_character_modifier = meridias_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+ek_daedric_artifacts.0005 = {
+	type = character_event
+	title = ek_daedric_artifacts.0004.t
+	desc = ek_daedric_artifacts.0005.desc
+	
+	left_portrait = {
+		character = root
+		animation = happiness
+	}
+
+	artifact = {
+		target = scope:dawnbreaker
+		position = lower_left_portrait
+		trigger = { exists = scope:dawnbreaker }
+	}
+
+	theme = faith
+
+	option = { # as you command
+		name = ek_daedric_artifacts.0005.a
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		add_trait = champion_meridia
+		save_scope_as = meridias_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:meridias_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0050 # Someone has become Meridias's Champion
+		}
+		add_character_flag = meridia_conversion
+		create_artifact_dawnbreaker_effect = { OWNER = ROOT }
+	}
+
+	option = { # i can't do this
+		name = ek_daedric_artifacts.0005.b
+		send_interface_toast = {
+			title = ek_daedric_artifacts.0005.c.toast
+			add_prestige = minor_prestige_gain
+		}
+	}
+}
+
+ek_daedric_artifacts.0006 = {
+	type = character_event
+	title = ek_daedric_artifacts.0006.t
+	desc = ek_daedric_artifacts.0006.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	immediate = {
+		random_courtier_or_guest = {
+			save_scope_as = sacrifice
+		}
+		scope:sacrifice = {
+			add_character_flag = boethiahs_marking
+		}
+	}
+
+	theme = murder_scheme
+
+	option = { # as you wish
+		name = ek_daedric_artifacts.0006.a
+		add_piety = medium_piety_loss
+		give_boethiah_worshipper_secret_or_trait_effect = yes
+		start_scheme = {
+			type = murder
+			target = scope:sacrifice
+		}
+	}
+
+	option = { # i can't do this
+		name = ek_daedric_artifacts.0006.c
+		add_character_modifier = boethiahs_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+ek_daedric_artifacts.0007 = {
+	type = character_event
+	title = ek_daedric_artifacts.0007.t
+	desc = ek_daedric_artifacts.0007.desc
+	
+	left_portrait = {
+		character = root
+		animation = happiness
+	}
+
+	artifact = {
+		target = scope:ebony_mail
+		position = lower_left_portrait
+		trigger = { exists = scope:ebony_mail }
+	}
+
+	theme = murder_scheme
+
+	option = { # as you command
+		name = ek_daedric_artifacts.0007.a
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		add_trait = champion_boethiah
+		save_scope_as = boethiahs_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:boethiahs_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0051 # Someone has become Boethiah's Champion
+		}
+		add_character_flag = boethiah_conversion
+		create_artifact_ebony_mail_effect = { OWNER = ROOT }
+	}
+
+	option = { # i can't do this
+		name = ek_daedric_artifacts.0007.b
+		send_interface_toast = {
+			title = ek_daedric_artifacts.0007.b.toast
+			add_prestige = minor_prestige_gain
+		}
+	}
+}
+
+# goldbrand event, duel boethiah's chosen
+ek_daedric_artifacts.0008 = {
+	type = duel_event
+	title = ek_daedric_artifacts.0008.t
+	desc = ek_daedric_artifacts.0008.desc
+	
+	left_portrait = {
+		character = root
+		scripted_animation = duel_wield_weapon
+	}
+
+	right_portrait = {
+		character = scope:boethiahs_champion
+		scripted_animation = duel_wield_weapon
+	}
+
+	override_background = {
+		event_background = wilderness_scope
+	}
+
+	artifact = {
+		target = scope:goldbrand
+		position = lower_left_portrait
+		trigger = { exists = scope:goldbrand }
+	}
+
+	theme = martial_chivalry_focus
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		OR = {
+			AND = {
+				can_secretly_worship_boethiah = yes
+				has_trait = blademaster_3
+			}
+			has_character_modifier = boethiahs_attention
+		}
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = goldbrand_modifier
+		}
+	}
+
+	immediate = {
+		create_character = {
+			template = dremora_boethiah_template
+			gender_female_chance = 50
+			location = root.capital_province
+			save_scope_as = boethiahs_champion
+		}
+	}
+
+	option = { # as you command
+		name = ek_daedric_artifacts.0008.a
+		configure_start_single_combat_effect = {
+			SC_INITIATOR = root
+			SC_ATTACKER = scope:boethiahs_champion
+			SC_DEFENDER = root
+			FATALITY = always
+			FIXED = no
+			LOCALE = terrain_scope
+			OUTPUT_EVENT = ek_daedric_artifacts.0009
+			INVALIDATION_EVENT = single_combat.1006
+		}
+	}
+
+	option = { # i can't do this
+		name = ek_daedric_artifacts.0008.b
+		send_interface_toast = {
+			title = ek_daedric_artifacts.0008.b.toast
+			add_prestige = medium_prestige_loss
+			increase_wounds_effect = { REASON = duel }
+		}
+	}
+}
+
+ek_daedric_artifacts.0009 = { #duel boethiah's champion
+	hidden = yes
+	
+
+	immediate = {
+		if = {
+			limit = {
+				root = scope:sc_victor
+			}
+			trigger_event = { id = ek_daedric_artifacts.0010 days = 1 }
+		}
+	}
+}
+
+ek_daedric_artifacts.0010 = {
+	type = character_event
+	title = ek_daedric_artifacts.0008.t
+	desc = ek_daedric_artifacts.0010.desc
+	
+	left_portrait = {
+		character = root
+		scripted_animation = duel_celebrate
+	}
+
+	override_background = {
+		event_background = wilderness_scope
+	}
+
+	artifact = {
+		target = scope:goldbrand
+		position = lower_left_portrait
+		trigger = { exists = scope:goldbrand }
+	}
+
+	theme = martial_chivalry_focus
+
+	option = { # as you command
+		name = ek_daedric_artifacts.0010.a
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		create_artifact_goldbrand_effect = { OWNER = ROOT }
+	}
+
+	option = { # i can't do this
+		name = ek_daedric_artifacts.0010.b
+		send_interface_toast = {
+			title = ek_daedric_artifacts.0010.b.toast
+			add_prestige = medium_prestige_gain
+			add_piety = medium_piety_gain
+		}
+	}
+}
+
+ek_daedric_artifacts.0011 = {
+	type = character_event
+	title = ek_daedric_artifacts.0011.t
+	desc = ek_daedric_artifacts.0011.desc
+	
+	left_portrait = {
+		character = root
+		animation = scheme
+	}
+
+	right_portrait = {
+		character = scope:recipient
+		animation = beg
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 0.2
+			has_trait = sadistic
+		}
+		modifier = {
+			add = 0.2
+			has_trait = torturer
+		}
+		modifier = {
+			add = 0.2
+			has_focus = intrigue_intimidation_focus
+		}
+		modifier = {
+			add = 1
+			has_character_modifier = molags_attention
+		}
+
+	}
+
+	trigger = {
+		can_secretly_worship_molag = yes
+		is_daedric_champion = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = mace_molag_bal_modifier
+		}
+		any_courtier_or_guest = {
+			has_relation_friend = root
+		}
+		dread > 50
+	}
+
+	immediate = {
+		random_courtier_or_guest = {
+			limit = {
+				OR = {
+					has_relation_friend = root 
+					has_relation_best_friend = root
+					has_relation_lover = root
+					has_relation_soulmate = root
+					is_close_family_of = root
+				}
+			}
+			save_scope_as = recipient
+		}
+		ROOT = {
+			save_scope_as = actor
+		}
+	}
+
+	theme = dread
+
+	option = { # yes i will
+		name = ek_daedric_artifacts.0011.a
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		add_trait = champion_molag
+		save_scope_as = molags_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:molags_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0052 # Someone has become Molag's Champion
+		}
+		add_character_flag = molag_conversion
+		create_artifact_mace_molag_bal_effect = { OWNER = ROOT }
+		scope:recipient = {
+			death = {
+				death_reason = death_execution
+				killer = ROOT
+			}
+		}
+	}
+
+	option = { # only suffering
+		name = ek_daedric_artifacts.0011.b
+		add_piety = medium_piety_loss
+		give_molag_worshipper_secret_or_trait_effect = yes
+		scope:recipient = {
+			add_character_flag = {
+				flag = is_being_tortured
+				months = 6 # Players in MP can keep the event window open...
+			}
+		}
+		torture_interaction_actor_effect = yes
+		hidden_effect = {
+			#Torture method for descs
+			random_list = {
+				3 = { save_scope_value_as = { name = torture_method value = flag:rack } }
+				3 = { save_scope_value_as = { name = torture_method value = flag:whip } }
+				1 = { save_scope_value_as = { name = torture_method value = flag:rats } }
+				8 = {
+					trigger = {
+						scope:actor = { has_trait = poet }
+					}
+					save_scope_value_as = {
+						name = torture_method
+						value = flag:poetry
+					}
+				}
+			}
+
+			#They have a secret I want to know about
+			if = {
+				limit = {
+					scope:recipient = {	
+						OR = {
+							any_secret = {
+								torture_secret_trigger = { PARTICIPANT = scope:recipient }
+							}
+							any_known_secret = {
+								secret_owner = { save_temporary_scope_as = torture_secret_owner }
+								torture_secret_trigger = { PARTICIPANT = scope:torture_secret_owner }
+							}
+						}
+					}
+				}
+				scope:recipient = {
+					trigger_event = {
+						id = prison.1001
+						days = 1
+					}
+				}
+			}
+			else = {
+				scope:actor = {
+					trigger_event = {
+						id = prison.1010
+						days = 1
+					}
+				}
+			}
+		}
+		# Dark Insights Perk:
+		if = {
+			limit = {
+				scope:actor = { has_perk = dark_insights_perk }
+			}
+			scope:actor = {
+				dark_insights_skill_gain_roll_effect = yes
+			}
+		}
+	}
+
+	option = { # i can't do this
+		name = ek_daedric_artifacts.0011.c
+		add_piety = medium_piety_gain
+		add_character_modifier = molags_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+# Azura wants to be your friend
+ek_daedric_artifacts.0012 = {
+	type = character_event
+	title = ek_daedric_artifacts.0012.t
+	desc = ek_daedric_artifacts.0012.desc
+	theme = befriend_scheme
+	
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = -0.2
+			has_trait = gluttonous
+		}
+		modifier = {
+			add = -0.2
+			has_trait = greedy
+		}
+		modifier = {
+			add = -0.2
+			has_trait = wrathful
+		}
+		modifier = {
+			add = -0.2
+			has_trait = impatient
+		}
+		modifier = {
+			add = -0.2
+			has_trait = humble
+		}
+		modifier = {
+			add = -0.2
+			has_trait = sadistic
+		}
+		modifier = {
+			add = -0.2
+			has_trait = reveler_1
+		}
+		modifier = {
+			add = -0.4
+			has_trait = reveler_2
+		}
+		modifier = {
+			add = -0.6
+			has_trait = reveler_3
+		}
+		modifier = {
+			add = 0.2
+			has_trait = temperate
+		}
+		modifier = {
+			add = 0.2
+			has_trait = calm
+		}
+		modifier = {
+			add = 0.2
+			has_trait = patient
+		}
+		modifier = {
+			add = 0.2
+			has_trait = arrogant
+		}
+		modifier = {
+			add = 0.2
+			has_trait = gregarious
+		}
+		modifier = {
+			add = 0.2
+			has_trait = mystic_1
+		}
+		modifier = {
+			add = 0.4
+			has_trait = mystic_2
+		}
+		modifier = {
+			add = 0.6
+			has_trait = mystic_3
+		}
+		modifier = {
+			add = 1
+			has_character_modifier = azuras_attention
+		}
+
+	}
+
+	trigger = {
+		can_secretly_worship_azura = yes
+		is_daedric_champion = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = azuras_star_modifier
+		}
+		sum_general_popularity_tally_value > 80
+	}
+
+	# calm down, let's get to know each other better
+	option = {
+		name = ek_daedric_artifacts.0012.a
+		add_piety = medium_piety_loss
+		give_azura_worshipper_secret_or_trait_effect = yes
+	}
+
+	# yaaas queen
+	option = {
+		name = ek_daedric_artifacts.0012.b
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		add_trait = champion_azura
+		save_scope_as = azuras_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:azuras_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0053 # Someone has become Azura's Champion
+		}
+		add_character_flag = azura_conversion
+		create_artifact_azuras_star_effect = { OWNER = ROOT }
+	}
+
+	# eww no
+	option = {
+		name = ek_daedric_artifacts.0012.c
+		add_piety = medium_piety_gain
+		add_character_modifier = azuras_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+# Clavicus wants to play a game
+ek_daedric_artifacts.0013 = {
+	type = character_event
+	title = ek_daedric_artifacts.0013.t
+	desc = ek_daedric_artifacts.0013.desc
+	theme = martial_chivalry_focus
+
+	override_background = {
+		event_background = sitting_room
+	}
+	
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:skaafin_clavicus
+		animation = scheme
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 1
+			has_character_modifier = clavicus_attention
+		}
+		modifier = {
+			add = -0.2
+			has_trait = generous
+		}
+		modifier = {
+			add = -0.2
+			has_trait = honest
+		}
+		modifier = {
+			add = -0.2
+			has_trait = compassionate
+		}
+		modifier = {
+			add = -0.2
+			has_trait = impatient
+		}
+		modifier = {
+			add = 0.2
+			has_trait = greedy
+		}
+		modifier = {
+			add = 0.2
+			has_trait = deceitful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = callous
+		}
+		modifier = {
+			add = 0.2
+			has_education_stewardship_trigger = yes
+		}
+
+	}
+
+	trigger = {
+		is_available_at_peace_adult = yes
+		is_landed = yes
+		can_secretly_worship_clavicus = yes
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = bittercup_modifier
+		}
+	}
+
+	immediate = {
+		create_character = {
+			template = skaafin_clavicus_template
+			name = "Nycot"
+			dynasty = none
+			gender_female_chance = 0
+			location = root.capital_province
+			save_scope_as = skaafin_clavicus
+		}
+	}
+
+	# game on, clavicus
+	option = {
+		name = ek_daedric_artifacts.0013.a
+		add_piety = medium_piety_loss
+		save_scope_value_as = {
+			name = chess_friendly
+			value = yes
+		}
+		configure_start_board_game_effect = {
+			BG_INITIATOR = ROOT
+			BG_ATTACKER = ROOT
+			BG_DEFENDER = scope:skaafin_clavicus
+			SYSTEM = chess
+			LOCALE = random_nice_day
+			OUTPUT_EVENT = ek_daedric_artifacts.0014
+			INVALIDATION_EVENT = board_games.0021
+		}
+	}
+
+	# eww no
+	option = {
+		name = ek_daedric_artifacts.0013.b
+		add_piety = medium_piety_gain
+		scope:skaafin_clavicus = { silent_disappearance_effect = yes }
+	}
+}
+
+ek_daedric_artifacts.0014 = {
+	hidden = yes
+
+	immediate = {
+		# We don't bother with a delay here because there's no risk of death, and we want to transfer counties and such immediately.
+		# Send out a toast to the victor.
+		scope:bg_victor = {
+			trigger_event = {
+				id = ek_daedric_artifacts.0016
+				days = 2
+			}
+		}
+		# And to the loser.
+		scope:bg_loser = {
+			trigger_event = {
+				id = ek_daedric_artifacts.0015
+				days = 2
+			}
+		}
+	}
+}
+
+ek_daedric_artifacts.0015 = {
+	type = character_event
+	title = ek_daedric_artifacts.0013.t
+	desc = ek_daedric_artifacts.0015.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	right_portrait = {
+		character = scope:skaafin_clavicus
+		animation = scheme
+	}
+
+	theme = martial_chivalry_focus
+
+	override_background = {
+		event_background = sitting_room
+	}
+	
+	option = { # as you wish
+		name = ek_daedric_artifacts.0015.a
+		add_prestige = medium_prestige_loss
+		add_piety = medium_piety_loss
+		give_clavicus_worshipper_secret_or_trait_effect = yes
+	}
+
+	option = { # never!
+		name = ek_daedric_artifacts.0015.b
+		add_prestige = medium_prestige_loss
+		add_piety = minor_piety_gain
+		add_character_modifier = clavicus_wrath
+		add_character_flag = make_suicide_available
+	}
+
+	after = {
+		if = {
+			limit = {
+				scope:skaafin_clavicus = {
+					is_alive = yes
+				}
+			}
+			scope:skaafin_clavicus = { silent_disappearance_effect = yes }
+		}
+	}
+}
+
+ek_daedric_artifacts.0016 = {
+	type = character_event
+	title = ek_daedric_artifacts.0013.t
+	desc = ek_daedric_artifacts.0016.desc
+	
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:skaafin_clavicus
+		animation = shock
+	}
+
+	theme = martial_chivalry_focus
+
+	override_background = {
+		event_background = sitting_room
+	}
+	
+	option = { # as you wish
+		name = ek_daedric_artifacts.0016.a
+		add_prestige = medium_prestige_gain
+		create_artifact_bittercup_effect = { OWNER = root }
+	}
+
+	after = {
+		scope:skaafin_clavicus = { silent_disappearance_effect = yes }
+	}
+}
+
+# The Bitterness of Power
+ek_daedric_artifacts.0017 = {
+	type = character_event
+	title = ek_daedric_artifacts.0017.t
+	desc = ek_daedric_artifacts.0017.desc
+	theme = faith
+	override_background = {
+		event_background = bedchamber
+	}
+
+	left_portrait = {
+		character = root
+	}
+
+	artifact = {
+		target = scope:bittercup
+		position = lower_left_portrait
+		trigger = { exists = scope:bittercup }
+	}
+
+	immediate = {
+		ek_get_lowest_player_skill_effect = yes
+		ek_get_highest_player_skill_effect = yes
+		every_character_artifact = {
+			limit = { has_artifact_modifier = bittercup_modifier }
+			save_scope_as = bittercup
+		}
+	}
+
+	option = {
+		custom_tooltip = ek_daedric_artifacts.0017.risk
+		name = ek_daedric_artifacts.0017.a
+
+		if = {
+			limit = { scope:lowest_player_skill = flag:diplomacy }
+			add_diplomacy_skill = -10
+		}
+		if = {
+			limit = { scope:lowest_player_skill = flag:martial }
+			add_martial_skill = -10
+		}
+		if = {
+			limit = { scope:lowest_player_skill = flag:stewardship }
+			add_stewardship_skill = -10
+		}
+		if = {
+			limit = { scope:lowest_player_skill = flag:intrigue }
+			add_intrigue_skill = -10
+		}
+		if = {
+			limit = { scope:lowest_player_skill = flag:learning }
+			add_learning_skill = -10
+		}
+		if = {
+			limit = { scope:lowest_player_skill = flag:prowess }
+			add_prowess_skill = -10
+		}
+		if = {
+			limit = { scope:lowest_player_skill = flag:arcana }
+			add_arcana_skill = { VALUE = -10 }
+		}
+
+		if = {
+			limit = { scope:highest_player_skill = flag:diplomacy }
+			add_diplomacy_skill = 10
+		}
+		if = {
+			limit = { scope:highest_player_skill = flag:martial }
+			add_martial_skill = 10
+		}
+		if = {
+			limit = { scope:highest_player_skill = flag:stewardship }
+			add_stewardship_skill = 10
+		}
+		if = {
+			limit = { scope:highest_player_skill = flag:intrigue }
+			add_intrigue_skill = 10
+		}
+		if = {
+			limit = { scope:highest_player_skill = flag:learning }
+			add_learning_skill = 10
+		}
+		if = {
+			limit = { scope:highest_player_skill = flag:prowess }
+			add_prowess_skill = 10
+		}
+		if = {
+			limit = { scope:highest_player_skill = flag:arcana }
+			add_arcana_skill = { VALUE = 10 }
+		}
+
+		scope:bittercup = {
+			destroy_artifact = this 
+		}
+
+		stress_impact = {
+			craven = medium_stress_gain
+			brave = medium_stress_loss
+		}
+	}
+
+	option = {
+		name = ek_daedric_artifacts.0017.b
+	}
+}
+
+# Masque Event
+ek_daedric_artifacts.0018 = {
+	type = character_event
+	title = ek_daedric_artifacts.0018.t
+	desc = ek_daedric_artifacts.0018.desc
+	theme = friendly
+
+	override_background = {
+		event_background = sitting_room
+	}
+	
+	left_portrait = {
+		character = root
+		animation = grief
+	}
+
+	right_portrait = {
+		character = scope:skaafin_clavicus
+		animation = scheme
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 1
+			has_character_modifier = clavicus_attention
+		}
+		modifier = {
+			add = -0.2
+			has_trait = generous
+		}
+		modifier = {
+			add = -0.2
+			has_trait = honest
+		}
+		modifier = {
+			add = -0.2
+			has_trait = compassionate
+		}
+		modifier = {
+			add = -0.2
+			has_trait = impatient
+		}
+		modifier = {
+			add = 0.2
+			has_trait = gluttonous
+		}
+		modifier = {
+			add = 0.2
+			has_trait = craven
+		}
+		modifier = {
+			add = 0.2
+			has_trait = shy
+		}
+		modifier = {
+			add = 0.2
+			has_trait = callous
+		}
+		modifier = {
+			add = 0.2
+			has_trait = sadistic
+		}
+		modifier = {
+			add = 0.2
+			has_trait = rakish
+		}
+		modifier = {
+			add = 0.2
+			has_trait = irritable
+		}
+		modifier = {
+			add = 0.2
+			has_trait = lunatic_1
+		}
+		modifier = {
+			add = 0.2
+			has_trait = lunatic_genetic
+		}
+		modifier = {
+			add = 0.2
+			has_trait = possessed_1
+		}
+		modifier = {
+			add = 0.2
+			has_trait = possessed_genetic
+		}
+		modifier = {
+			add = 0.2
+			has_trait = lovers_pox
+		}
+		modifier = {
+			add = 0.2
+			has_trait = wounded_2
+		}
+		modifier = {
+			add = 0.4
+			has_trait = wounded_3
+		}
+		modifier = {
+			add = 0.6
+			has_trait = maimed
+		}
+		modifier = {
+			add = 0.6
+			has_trait = one_eyed
+		}
+		modifier = {
+			add = 0.6
+			has_trait = one_legged
+		}
+		modifier = {
+			add = 0.6
+			has_trait = disfigured
+		}
+		modifier = {
+			add = 0.6
+			has_trait = gout_ridden
+		}
+		modifier = {
+			add = 0.6
+			has_trait = eunuch
+		}
+		modifier = {
+			add = 0.6
+			has_trait = blind
+		}
+		modifier = {
+			add = 0.2
+			has_trait = beauty_bad_1
+		}
+		modifier = {
+			add = 0.4
+			has_trait = beauty_bad_2
+		}
+		modifier = {
+			add = 0.6
+			has_trait = beauty_bad_3
+		}
+		modifier = {
+			add = 0.2
+			has_trait = physique_bad_1
+		}
+		modifier = {
+			add = 0.4
+			has_trait = physique_bad_2
+		}
+		modifier = {
+			add = 0.6
+			has_trait = physique_bad_3
+		}
+		modifier = {
+			add = 0.6
+			has_trait = clubfooted
+		}
+		modifier = {
+			add = 0.6
+			has_trait = hunchbacked
+		}
+		modifier = {
+			add = 0.6
+			has_trait = dwarf
+		}
+		modifier = {
+			add = 0.6
+			has_trait = giant
+		}
+		modifier = {
+			add = 0.6
+			has_trait = inbred
+		}
+		modifier = {
+			add = 0.6
+			has_trait = weak
+		}
+		modifier = {
+			add = 0.6
+			has_trait = spindly
+		}
+		modifier = {
+			add = 0.6
+			has_trait = scaly
+		}
+		modifier = {
+			add = 0.6
+			has_trait = albino
+		}
+		modifier = {
+			add = 0.6
+			has_trait = wheezing
+		}
+		modifier = {
+			add = 0.6
+			has_trait = bleeder
+		}
+		modifier = {
+			add = 0.6
+			has_trait = murderer
+		}
+		modifier = {
+			add = 0.6
+			has_trait = disinherited
+		}
+		modifier = {
+			add = 0.6
+			has_trait = scarab_blood
+		}
+		modifier = {
+			add = 0.2
+			has_trait = greedy
+			
+		}
+		modifier = {
+			add = 0.2
+			has_trait = deceitful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = callous
+		}
+		modifier = {
+			add = 0.2
+			has_education_stewardship_trigger = yes
+		}
+	}
+
+
+	trigger = {
+		can_secretly_worship_clavicus = yes
+		is_daedric_champion = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = masque_vile_modifier
+		}
+	}
+
+	immediate = {
+		create_character = {
+			template = skaafin_clavicus_template
+			name = "Nycot"
+			dynasty = none
+			gender_female_chance = 0
+			location = root.capital_province
+			save_scope_as = skaafin_clavicus
+		}
+	}
+
+	# pls, clavicus
+	option = {
+		name = ek_daedric_artifacts.0018.a
+		add_piety = medium_piety_loss
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		create_artifact_masque_vile_effect = { OWNER = root }
+		add_trait = champion_clavicus
+		save_scope_as = clavicus_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:clavicus_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0054 # Someone has become Clavicus' Champion
+		}
+		add_character_flag = clavicus_conversion
+	}
+
+	option = { # just a little bit
+		name = ek_daedric_artifacts.0018.b
+		add_prestige = medium_prestige_loss
+		add_piety = medium_piety_loss
+		give_clavicus_worshipper_secret_or_trait_effect = yes
+		add_character_modifier = viles_pity
+	}
+
+	# eww no
+	option = {
+		name = ek_daedric_artifacts.0018.c
+		add_piety = medium_piety_gain
+		add_character_modifier = clavicus_wrath
+		add_character_flag = make_suicide_available
+	}
+
+	after = {
+		if = {
+			limit = {
+				scope:skaafin_clavicus = {
+					is_alive = yes
+				}
+			}
+			scope:skaafin_clavicus = { silent_disappearance_effect = yes }
+		}
+	}
+}
+
+# Razor Event
+ek_daedric_artifacts.0019 = {
+	type = character_event
+	title = ek_daedric_artifacts.0019.t
+	desc = {
+		first_valid = {
+			triggered_desc = {
+				trigger = {
+					NOT = {
+						has_trait = calm
+						has_trait = content
+						has_trait = forgiving
+					}
+					OR = {
+						has_trait = wrathful
+						has_trait = ambitious
+						has_trait = vengeful
+					}
+				}
+				desc = ek_daedric_artifacts.0019.descworthy
+			}
+			triggered_desc = {
+				trigger = {
+					OR = {
+						has_trait = calm
+						has_trait = content
+						has_trait = forgiving
+					}
+					NOT = {
+						has_trait = wrathful
+						has_trait = ambitious
+						has_trait = vengeful
+					}
+				}
+				desc = ek_daedric_artifacts.0019.descunworthy
+			}	
+		}
+	}
+	theme = murder_scheme
+
+	override_background = {
+		event_background = sitting_room
+	}
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:mehrunes_razor
+		position = lower_left_portrait
+		trigger = { exists = scope:mehrunes_razor }
+	}
+
+
+	trigger = {
+		any_equipped_character_artifact = {
+			has_artifact_modifier = mehrunes_razor_modifier
+		}
+		can_secretly_worship_mehrunes = yes
+		is_daedric_champion = no
+	}
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = { has_artifact_modifier = mehrunes_razor_modifier }
+			save_scope_as = mehrunes_razor
+		}
+	}
+
+	# i'll be your champion
+	option = {
+		name = ek_daedric_artifacts.0019.a
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		add_trait = champion_mehrunes
+		save_scope_as = mehrunes_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:mehrunes_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0055 # Someone has become Mehrunes' Champion
+		}
+		add_character_flag = mehrunes_conversion
+	}
+
+	option = { # keep it, m'lord
+		name = ek_daedric_artifacts.0019.b
+		add_piety = medium_piety_loss
+		give_mehrunes_worshipper_secret_or_trait_effect = yes
+		destroy_artifact = scope:mehrunes_razor
+	}
+
+	# eww no
+	option = {
+		name = ek_daedric_artifacts.0019.c
+		add_piety = medium_piety_gain
+		add_character_modifier = mehrunes_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+# Black Book: Filament and Filigree
+ek_daedric_artifacts.0020 = {
+	type = character_event
+	title = ek_daedric_artifacts.0020.t
+	desc = ek_daedric_artifacts.0020.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bb_filament
+		position = lower_left_portrait
+		trigger = { exists = scope:bb_filament }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = bb_filament
+			}
+			save_scope_as = bb_filament
+		}
+	}
+
+	option = { # power
+		name = ek_daedric_artifacts.0020.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0020.a.tt.success
+				add_prowess_skill = 5
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # sorcery
+		name = ek_daedric_artifacts.0020.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0020.b.tt.success
+				add_arcana_skill = { VALUE = 5}
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # stealth
+		name = ek_daedric_artifacts.0020.c
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0020.c.tt.success
+				add_intrigue_skill = 5
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+	after = {
+		scope:bb_filament = {
+			destroy_artifact = this 
+		}
+	}
+}
+
+# Black Book: The Hidden Twilight
+ek_daedric_artifacts.0021 = {
+	type = character_event
+	title = ek_daedric_artifacts.0021.t
+	desc = ek_daedric_artifacts.0021.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bb_twilight
+		position = lower_left_portrait
+		trigger = { exists = scope:bb_twilight }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = bb_twilight
+			}
+			save_scope_as = bb_twilight
+		}
+	}
+
+	option = { # agony
+		name = ek_daedric_artifacts.0021.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0021.a.tt.success
+				add_dread = major_dread_gain
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # grasp
+		name = ek_daedric_artifacts.0021.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0021.b.tt.success
+				every_held_title = {
+					limit = {
+						tier = tier_county
+					}
+					change_county_control = executioner_control_value
+				}
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # boon
+		name = ek_daedric_artifacts.0021.c
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0021.c.tt.success
+				add_character_modifier = moras_boon
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+	after = {
+		scope:bb_twilight = {
+			destroy_artifact = this 
+		}
+	}
+}
+
+# Black Book: The Sallow Regent
+ek_daedric_artifacts.0022 = {
+	type = character_event
+	title = ek_daedric_artifacts.0022.t
+	desc = ek_daedric_artifacts.0022.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bb_sallow
+		position = lower_left_portrait
+		trigger = { exists = scope:bb_sallow }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = bb_sallow
+			}
+			save_scope_as = bb_sallow
+		}
+	}
+
+	option = { # might
+		name = ek_daedric_artifacts.0022.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0022.a.tt.success
+				add_martial_lifestyle_xp = massive_lifestyle_xp
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # sorcery
+		name = ek_daedric_artifacts.0022.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0022.b.tt.success
+				add_magic_lifestyle_xp = massive_lifestyle_xp
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # shadows
+		name = ek_daedric_artifacts.0022.c
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0022.c.tt.success
+				add_intrigue_lifestyle_xp = massive_lifestyle_xp
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+	after = {
+		scope:bb_sallow = {
+			destroy_artifact = this 
+		}
+	}
+}
+
+# Black Book: The Winds of Change
+ek_daedric_artifacts.0023 = {
+	type = character_event
+	title = ek_daedric_artifacts.0023.t
+	desc = ek_daedric_artifacts.0023.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bb_change
+		position = lower_left_portrait
+		trigger = { exists = scope:bb_change }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = bb_change
+			}
+			save_scope_as = bb_change
+		}
+	}
+
+	option = { # scholar
+		name = ek_daedric_artifacts.0023.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0023.a.tt.success
+				add_character_modifier = scholar_insight
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # companion
+		name = ek_daedric_artifacts.0023.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0023.b.tt.success
+				add_perk = befriend_perk
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # lover
+		name = ek_daedric_artifacts.0023.c
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0023.c.tt.success
+				add_character_modifier = lovers_insight
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+	after = {
+		scope:bb_change = {
+			destroy_artifact = this 
+		}
+	}
+}
+
+# Black Book: Untold Legends
+ek_daedric_artifacts.0024 = {
+	type = character_event
+	title = ek_daedric_artifacts.0024.t
+	desc = ek_daedric_artifacts.0024.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bb_untold
+		position = lower_left_portrait
+		trigger = { exists = scope:bb_untold }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = bb_untold
+			}
+			save_scope_as = bb_untold
+		}
+		create_character = {
+			template = secret_servant_template
+			location = root.capital_province
+			gender_female_chance = 50
+			save_scope_as = secret_servant
+		}
+		scope:secret_servant = {
+			add_character_flag = summoned_daedra
+			add_opinion = {
+				target = prev
+				modifier = thrall_opinion
+			}
+		}
+	}
+
+	option = { # bard
+		name = ek_daedric_artifacts.0024.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0024.a.tt.success
+				add_trait = poet
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # money
+		name = ek_daedric_artifacts.0024.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0024.b.tt.success
+				add_gold = massive_gold_value
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # servant
+		name = ek_daedric_artifacts.0024.c
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0024.c.tt.success
+				add_courtier = scope:secret_servant
+				add_hook = {
+					type = loyalty_hook
+					target = scope:secret_servant
+				}
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+	after = {
+		scope:bb_untold = {
+			destroy_artifact = this 
+		}
+	}
+}
+
+# Black Book: Waking Dreams
+ek_daedric_artifacts.0025 = {
+	type = character_event
+	title = ek_daedric_artifacts.0025.t
+	desc = ek_daedric_artifacts.0025.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:bb_waking
+		position = lower_left_portrait
+		trigger = { exists = scope:bb_waking }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = bb_waking
+			}
+			save_scope_as = bb_waking
+		}
+	}
+
+	option = { # go back
+		name = ek_daedric_artifacts.0025.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0025.a.tt.success
+				refund_all_perks = yes
+				add_character_flag = {
+					flag = has_refunded_perks
+				}
+				remove_all_perk_lifestyle_traits_effect = yes
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	option = { # go deeper
+		name = ek_daedric_artifacts.0025.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0024.b.tt.success
+				add_character_modifier = scholar_insight
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+	}
+
+	after = {
+		scope:bb_waking = {
+			destroy_artifact = this 
+		}
+	}
+}
+
+# A Book that Knows
+ek_daedric_artifacts.0026 = {
+	type = character_event
+	title = ek_daedric_artifacts.0026.t
+	desc = ek_daedric_artifacts.0026.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	artifact = {
+		target = scope:oghma_infinium
+		position = lower_left_portrait
+		trigger = { exists = scope:oghma_infinium }
+	}
+
+	theme = learning
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = oghma_infinium
+			}
+			save_scope_as = oghma_infinium
+		}
+	}
+
+	option = { # master craft
+		name = ek_daedric_artifacts.0026.a
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0026.a.tt.success
+				if = {
+					limit = {
+						has_trait = education_magical_ability
+					}
+					add_arcana_skill = { VALUE = 10 }
+				}
+				if = {
+					limit = {
+						has_trait = education_martial_prowess
+					}
+					add_prowess_skill = 10
+				}
+				if = {
+					limit = {
+						has_trait = education_learning
+					}
+					add_learning_skill = 10
+				}
+				if = {
+					limit = {
+						has_trait = education_intrigue
+					}
+					add_intrigue_skill = 10
+				}
+				if = {
+					limit = {
+						has_trait = education_martial
+					}
+					add_martial_skill = 10
+				}
+				if = {
+					limit = {
+						has_trait = education_diplomacy
+					}
+					add_diplomacy_skill = 10
+				}
+				if = {
+					limit = {
+						has_trait = education_stewardship
+					}
+					add_stewardship_skill = 10
+				}
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+		scope:oghma_infinium = {
+			destroy_artifact = this 
+		}
+	}
+
+
+
+	option = { # long life
+		name = ek_daedric_artifacts.0026.b
+		give_hermaeus_worshipper_secret_or_trait_effect = yes
+		duel = {
+			skill = learning
+			value = 10
+			10 = {
+				modifier = {add = scope:duel_value}
+				desc = ek_daedric_artifacts.0026.b.tt.success
+				increase_lifespan_effect = yes
+			}
+			10 = {
+				modifier = {add = scope:duel_value.*-1}
+				desc = ek_daedric_artifacts.0020.a.tt.failure
+				random_list = {
+					10 = {
+						trigger = { NOT = { has_trait = lunatic } }
+						add_trait = lunatic_1
+					}
+					10 = {
+						trigger = { NOT = { has_trait = possessed } }
+						add_trait = possessed_1
+					}
+					10 = {
+						death = { death_reason = death_vanished }
+					}
+				}
+			}
+		}
+		scope:oghma_infinium = {
+			destroy_artifact = this 
+		}
+	}
+
+	option = { # champion
+		name = ek_daedric_artifacts.0026.c
+		trigger = {
+			is_daedric_champion = no
+		}
+		add_trait = champion_hermaeus
+		save_scope_as = hermaeus_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:hermaeus_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0056 # Someone has become Hermaeus' Champion
+		}
+		add_character_flag = hermaeus_conversion
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+	}
+}
+
+# To Taste Death
+ek_daedric_artifacts.0027 = {
+	type = character_event
+	title = ek_daedric_artifacts.0027.t
+	desc = ek_daedric_artifacts.0027.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	theme = secret
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 1
+			has_character_modifier = namiras_attention
+		}
+		modifier = {
+			add = -0.2
+			has_trait = wrathful
+		}
+		modifier = {
+			add = -0.2
+			has_trait = impatient
+		}
+		modifier = {
+			add = -0.2
+			has_trait = honest
+		}
+		modifier = {
+			add = 0.2
+			has_trait = calm
+		}
+		modifier = {
+			add = 0.2
+			has_trait = patient
+		}
+		modifier = {
+			add = 0.2
+			has_trait = deceitful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = possessed
+		}
+	}
+
+	trigger = {
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = ring_namira_modifier
+		}
+		is_cannibal_trigger = yes
+		is_daedric_champion = no
+	}
+
+	option = { # as you command
+		name = ek_daedric_artifacts.0027.a
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		add_trait = champion_namira
+		save_scope_as = namiras_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:namiras_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0057 # Someone has become Namira's Champion
+		}
+		add_character_flag = namira_conversion
+		create_artifact_ring_namira_effect = { OWNER = ROOT }
+	}
+
+	option = { # in secret
+		name = ek_daedric_artifacts.0027.b
+		add_piety = medium_piety_loss
+		give_namira_worshipper_secret_or_trait_effect = yes
+	}
+
+	# eww no
+	option = {
+		name = ek_daedric_artifacts.0027.c
+		add_piety = medium_piety_gain
+		add_character_modifier = namiras_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+# Unexpected Results for killing the monster of x
+ek_daedric_artifacts.0028 = {
+	type = character_event
+	title = ek_daedric_artifacts.0028.t
+	desc = ek_daedric_artifacts.0028.desc
+	
+	left_portrait = {
+		character = root
+		animation = shock
+	}
+
+	theme = hunt_activity
+
+	trigger = {
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = ring_hircine_modifier
+		}
+	}
+
+	option = { # take ring
+		name = ek_daedric_artifacts.0028.a
+		add_piety = medium_piety_loss
+		create_artifact_ring_hircine_effect = { OWNER = ROOT }
+	}
+
+	option = { # bury kid
+		name = ek_daedric_artifacts.0028.b
+		add_piety = medium_piety_gain
+	}
+
+	# study corpse
+	option = {
+		name = ek_daedric_artifacts.0028.c
+		trigger = {
+			has_focus_learning = yes
+		}
+		add_piety = medium_piety_loss
+		add_learning_lifestyle_xp = major_lifestyle_xp
+	}
+}
+
+# Unlock Potential Event
+ek_daedric_artifacts.0029 = {
+	type = character_event
+	title = ek_daedric_artifacts.0029.t
+	desc = ek_daedric_artifacts.0029.desc
+	
+	left_portrait = {
+		character = root
+	}
+
+	artifact = {
+		target = scope:skeleton_key
+		position = lower_left_portrait
+		trigger = { exists = scope:skeleton_key }
+	}
+
+	theme = secret
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = skeleton_key
+			}
+			save_scope_as = skeleton_key
+		}
+	}
+
+	option = { # unlock
+		name = ek_daedric_artifacts.0029.a
+		ek_rank_up_education_effect = yes
+		if = {
+			limit = {
+				has_trait = education_magical_ability
+			}
+			add_magic_lifestyle_xp = monumental_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_learning
+			}
+			add_learning_lifestyle_xp = monumental_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_intrigue
+			}
+			add_intrigue_lifestyle_xp = monumental_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_martial
+			}
+			add_martial_lifestyle_xp = monumental_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_diplomacy
+			}
+			add_diplomacy_lifestyle_xp = monumental_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_stewardship
+			}
+			add_stewardship_lifestyle_xp = monumental_lifestyle_xp
+		}
+		scope:skeleton_key = {
+			destroy_artifact = this 
+		}
+	}
+
+	option = { # i'd rather keep it
+		name = ek_daedric_artifacts.0029.b
+	}
+}
+
+ek_daedric_artifacts.0030 = { #clone duel
+	hidden = yes
+	
+
+	immediate = {
+		if = {
+			limit = {
+				scope:clone = scope:sc_victor
+			}
+			scope:recipient = {
+				send_interface_toast = {
+					left_icon = scope:clone
+					title = clone_won
+				}	
+			}
+			scope:actor = {
+				add_secret = {
+					type = secret_murder
+					target = scope:recipient
+				}
+				send_interface_toast = {
+					left_icon = scope:clone
+					title = clone_won2
+				}	
+			}
+		}
+		else = {
+			scope:recipient = {
+				send_interface_toast = {
+					left_icon = scope:clone
+					title = clone_lost
+				}	
+			}
+			scope:actor = {
+				send_interface_toast = {
+					left_icon = scope:clone
+					title = clone_lost2
+				}	
+			}
+		}
+	}
+}
+
+# A Worthy Challenge
+ek_daedric_artifacts.0031 = {
+	type = character_event
+	title = ek_daedric_artifacts.0031.t
+	desc = ek_daedric_artifacts.0031.desc
+	theme = martial
+	
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:challenger
+		scripted_animation = duel_wield_weapon
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 1
+			has_character_modifier = malacaths_attention
+		}
+		modifier = {
+			add = -0.2
+			has_trait = deceitful
+		}
+		modifier = {
+			add = -0.2
+			has_trait = craven
+		}
+		modifier = {
+			add = -0.2
+			has_trait = forgiving
+		}
+		modifier = {
+			add = -0.2
+			has_trait = physique_bad
+		}
+		modifier = {
+			add = -0.2
+			has_trait = weak
+		}
+		modifier = {
+			add = 0.2
+			has_trait = wrathful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = brave
+		}
+		modifier = {
+			add = 0.2
+			has_trait = vengeful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = physique_good
+		}
+		modifier = {
+			add = 0.2
+			has_trait = strong
+		}
+	}	
+
+	trigger = {
+		OR = {
+			any_neighboring_top_liege_realm_owner = {
+				is_ai = yes
+				prowess >= root.prowess
+				age > 16
+			}
+			AND = {
+				is_independent_ruler = no
+				any_liege_or_above = {
+					is_ai = yes
+					prowess >= root.prowess
+					age > 16
+				}
+			}
+		}
+		has_focus = martial_chivalry_focus
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = volendrung_modifier
+		}
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				is_independent_ruler = no
+			}
+			random_liege_or_above = {
+				limit = {
+					is_ai = yes
+					prowess >= root.prowess
+					age > 16
+				}
+				save_scope_as = challenger
+			}
+		}
+		else = {
+			random_neighboring_top_liege_realm_owner = {
+				limit = {
+					is_ai = yes
+					prowess >= root.prowess
+					age > 16
+				}
+				save_scope_as = challenger
+			}
+		}
+	}
+
+	# hammer time
+	option = {
+		name = ek_daedric_artifacts.0031.a
+		add_piety = minor_piety_loss
+		configure_start_single_combat_effect = {
+			SC_INITIATOR = root
+			SC_ATTACKER = root
+			SC_DEFENDER = scope:challenger
+			FATALITY = always
+			FIXED = no
+			LOCALE = terrain_scope
+			OUTPUT_EVENT = ek_daedric_artifacts.0032
+			INVALIDATION_EVENT = single_combat.1006
+		}
+	}
+
+	# no thanks
+	option = {
+		name = ek_daedric_artifacts.0031.b
+		add_piety = minor_piety_gain
+	}
+}
+
+ek_daedric_artifacts.0032 = {
+	hidden = yes
+	
+
+	immediate = {
+		if = {
+			limit = {
+				root = scope:sc_victor
+			}
+			create_title_and_vassal_change = {
+			type = conquest
+			save_scope_as = change
+			}
+			scope:sc_loser = {
+				change_title_holder_include_vassals = {
+					holder = scope:sc_victor
+					change = scope:change
+				}
+			}
+			resolve_title_and_vassal_change = scope:change
+			trigger_event = { id = ek_daedric_artifacts.0033 days = 1 }
+		}
+	}
+}
+
+ek_daedric_artifacts.0033 = {
+	type = character_event
+	title = ek_daedric_artifacts.0031.t
+	desc = ek_daedric_artifacts.0033.desc
+	theme = martial
+	
+	left_portrait = {
+		character = root
+		animation = happiness
+	}
+
+	option = { # i'll take it, m'lord
+		name = ek_daedric_artifacts.0033.a
+		add_piety = medium_piety_loss
+		give_malacath_worshipper_secret_or_trait_effect = yes
+		create_artifact_volendrung_effect = { OWNER = ROOT }
+	}
+
+	# eww no
+	option = {
+		name = ek_daedric_artifacts.0033.b
+		add_piety = medium_piety_gain
+	}
+}
+
+# Tickled to Death
+ek_daedric_artifacts.0034 = {
+	type = character_event
+	title = ek_daedric_artifacts.0034.t
+	desc = ek_daedric_artifacts.0034.desc
+	theme = friendly
+	
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:tickles
+		animation = ecstasy
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 1
+			has_character_modifier = sheogoraths_attention
+		}
+		modifier = {
+			add = -0.2
+			has_trait = shy
+		}
+		modifier = {
+			add = -0.2
+			has_trait = just
+		}
+		modifier = {
+			add = -0.2
+			has_trait = stubborn
+		}
+		modifier = {
+			add = 0.2
+			has_trait = gregarious
+		}
+		modifier = {
+			add = 0.2
+			has_trait = arbitrary
+		}
+		modifier = {
+			add = 0.2
+			has_trait = lunatic
+		}
+		modifier = {
+			add = 0.2
+			has_trait = fickle
+		}
+	}
+
+	trigger = {
+		can_employ_court_position_type = court_jester_court_position
+		can_secretly_worship_sheogorath = yes
+		is_daedric_champion = no
+		any_living_character = {
+			count < 1
+			has_character_flag = tickles
+		}
+	}
+
+	immediate = {
+		create_character = {
+			dynasty = none
+			faith = root.faith
+			culture = root.culture
+			age = root.age
+			gender = root
+			location = root.location
+			random_traits = yes
+			save_scope_as = tickles
+			after_creation = {
+				change_first_name = Tickles
+				copy_inheritable_appearance_from = root
+				set_nickname_effect = {	NICKNAME = nick_jester	}
+				add_character_flag = tickles
+				add_trait = disfigured
+				add_character_flag = summoned_daedra
+				ek_character_setup_effect = yes
+			}
+		}
+	}
+
+	option = { # invite this clown!
+		name = ek_daedric_artifacts.0034.a
+		add_character_flag = invited_tickles
+		remove_short_term_gold = minor_gold_value
+		custom_tooltip = ek_daedric_artifacts.0034.a.tooltip
+		add_courtier = scope:tickles
+	}
+
+	option = { # good fun
+		name = ek_daedric_artifacts.0034.b
+		stress_impact = {
+			base = -50
+		}
+		scope:tickles = { silent_disappearance_effect = yes }
+	}
+}
+
+ek_daedric_artifacts.0035 = {
+	type = character_event
+	title = {
+		first_valid = {
+			triggered_desc = {
+				trigger = { current_month = 1 }
+				desc = ek_daedric_artifacts.0035.new_life.t 
+			} 
+			desc = ek_daedric_artifacts.0034.t
+		}
+	}
+	desc = ek_daedric_artifacts.0035.desc
+	theme = feast_activity
+	
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:concerned_courtier
+		animation = beg
+	}
+
+	lower_right_portrait = {
+		character = scope:tickles
+	}	
+
+	trigger = {
+		has_character_flag = invited_tickles
+		scope:activity = {
+			any_participant = {
+				feast_default_participant_trigger = yes
+				NOT = { has_character_flag = tickles }
+				is_courtier_of = root
+			}
+		}
+	}
+
+	immediate = {
+		remove_character_flag = invited_tickles
+		scope:activity = {
+			random_participant = {
+				limit = {
+					NOT = { has_character_flag = tickles }
+					feast_default_participant_trigger = yes
+					is_alive = yes
+					is_courtier_of = root
+				}
+				save_scope_as = concerned_courtier
+			}
+		}
+		random_living_character = {
+			limit = {
+				has_character_flag = tickles
+			}
+			save_scope_as = tickles
+		}
+	}
+
+	option = { # what? no way!
+		name = ek_daedric_artifacts.0035.a
+		custom_tooltip = ek_daedric_artifacts.0035.a.tooltip
+		add_prestige = minor_prestige_loss
+		appoint_court_position = {
+			recipient = scope:tickles
+			court_position = court_jester_court_position
+		}
+		reverse_add_opinion = {
+			modifier = thinks_liege_incapable_opinion
+			target = scope:concerned_courtier
+		}
+	}
+	
+	option = { # sure buddy
+		name = ek_daedric_artifacts.0035.b
+		custom_tooltip = ek_daedric_artifacts.0035.b.tooltip
+		appoint_court_position = {
+			recipient = scope:tickles
+			court_position = court_jester_court_position
+		}
+	}
+
+	option = { # i guess you're right
+		name = ek_daedric_artifacts.0035.c
+		custom_tooltip = ek_daedric_artifacts.0035.c.tooltip
+		set_relation_friend = { reason = friend_generic_history target = scope:concerned_courtier }
+		scope:tickles = { silent_disappearance_effect = yes }
+	}
+
+	after = {
+		hidden_effect = {
+			feast_wrap_up_or_fire_random_event_effect = yes
+		}
+	}
+}
+
+ek_daedric_artifacts.0036 = {
+	type = character_event
+	title = yearly.4031.t
+	desc = {
+		desc = yearly.4031.desc_opening
+		first_valid = {
+			triggered_desc = {
+				trigger = {
+					exists = scope:physician
+				}
+				desc = yearly.4031.desc_physician
+			}
+			desc = yearly.4031.desc
+		}
+	}
+	left_portrait = root
+	right_portrait = scope:physician
+	theme = death
+
+	cooldown = { years = yearly_cooldown }
+	
+	trigger = {
+		any_courtier = {
+			has_court_position = court_jester_court_position
+			has_character_flag = tickles
+		}
+	}
+
+	immediate = {
+		random_living_character = {
+			limit = {
+				has_character_flag = tickles
+			}
+			save_scope_as = tickles
+		}
+		#To save the court physician
+		save_court_physician_as_effect = { SCOPE_NAME = physician }
+	}
+
+	option = { #We will launch an investigation!!
+		name = yearly.4031.a
+		custom_tooltip = yearly.4031.tt
+		trigger_event = {
+			id = ek_daedric_artifacts.0037
+			days = { 300 365 }
+		}
+		ai_chance = {
+			base = 20
+			modifier = {
+				factor = 0
+				has_trait = arbitrary
+			}
+			modifier = {
+				factor = 3
+				has_trait = just
+			}
+		}
+	}
+
+	option = { # Why should I care?
+		name = yearly.4031.b
+		every_courtier = {
+			custom = yearly.4031.b_every_courtier
+			add_opinion = {
+				target = root
+				modifier = respect_opinion
+				opinion = -15
+			}
+		}
+		stress_impact = {
+			compassionate = medium_stress_impact_gain
+			paranoid = medium_stress_impact_gain
+			callous = medium_stress_impact_loss
+		}
+		ai_chance = {
+			base = 10
+			modifier = {
+				factor = 3
+				has_trait = callous
+			}
+			modifier = {
+				factor = 0
+				has_trait = just
+			}
+		}
+	}
+	
+	option = { #You will investigate the bodies
+		name = yearly.4031.c
+		trigger = {
+			exists = scope:physician
+		}
+		trigger_event = {
+			id = ek_daedric_artifacts.0037
+			days = { 300 365 }
+		}
+		custom_tooltip = yearly.4031.tt
+		ai_chance = {
+			base = 60
+		}
+	}
+}
+
+ek_daedric_artifacts.0037 = {
+	type = character_event
+	title = murders_at_court.1002.t
+	desc = {
+		first_valid = {
+			triggered_desc = {
+				trigger = {
+					exists = scope:victim
+				}
+				desc = murders_at_court.1002.desc_named
+			}
+			desc = murders_at_court.1002.desc
+		}
+	}
+	theme = death
+	left_portrait = {
+		character = root
+		triggered_animation = {
+			trigger = {
+				scope:victim = { has_any_good_relationship_with_root_trigger = yes }
+			}
+			animation = grief
+		}
+		triggered_animation = {
+			trigger = {
+				scope:victim = { has_any_good_relationship_with_root_trigger = no }
+			}
+			animation = sadness
+		}
+	}
+	right_portrait = scope:victim
+
+	immediate = {
+		random_living_character = {
+			limit = {
+				has_character_flag = tickles
+			}
+			save_scope_as = tickles
+		}
+		if = {
+			limit = {
+				any_courtier = {
+					basic_is_available_ai = yes
+					NOT = { is_close_or_extended_family_of = root }
+					OR = { #You probably care more for highly skilled courtiers
+						martial > high_skill_rating
+						diplomacy > high_skill_rating
+						intrigue > high_skill_rating
+						learning > high_skill_rating
+						stewardship > high_skill_rating
+						prowess > high_skill_rating
+					}
+				}
+			}
+			random_courtier = {
+				limit = {
+					basic_is_available_ai = yes
+					NOT = { is_close_or_extended_family_of = root }
+					has_friendly_relationship_with_root_trigger = yes
+				}
+				alternative_limit = {
+					basic_is_available_ai = yes
+					NOT = { is_close_or_extended_family_of = root }
+					OR = { #You probably care more for highly skilled courtiers
+						martial > high_skill_rating
+						diplomacy > high_skill_rating
+						intrigue > high_skill_rating
+						learning > high_skill_rating
+						stewardship > high_skill_rating
+						prowess > high_skill_rating
+					}
+				}
+				save_scope_as = victim
+				show_as_tooltip = {
+					death = {
+						death_reason = death_murder
+					}
+				}
+			}
+			hidden_effect = {
+				unknown_murder_effect = {
+					VICTIM = scope:victim
+					MURDERER = scope:tickles
+					REASON = death_murder
+				}
+			}
+		}
+	}
+
+	option = {
+		name = murders_at_court.1001.a
+		add_piety = minor_piety_gain
+		trigger_event = {
+			id = ek_daedric_artifacts.0038
+			days = { 300 365 }
+		}
+	}
+
+	option = { #Limit the movement of everyone with access to the court
+		name = murders_at_court.1001.b
+		custom_tooltip = murders_at_court.1001.b.tt
+		every_courtier = {
+			custom = murder_at_court_movement_restricted_courtiers
+			add_opinion = {
+				target = root
+				modifier = respect_opinion
+				opinion = -20
+			}
+		}
+		add_character_modifier = {
+			modifier = restricted_movement_vassal_opinion
+			years = 5
+		}
+		trigger_event = {
+			id = ek_daedric_artifacts.0038
+			days = { 300 365 }
+		}
+	}
+
+	option = { #Double the guards
+		name = murders_at_court.1001.c
+		custom_tooltip = murders_at_court.1001.c.tt
+		remove_short_term_gold = medium_gold_value
+		trigger_event = {
+			id = ek_daedric_artifacts.0038
+			days = { 300 365 }
+		}
+	}
+
+	option = { #Plead for clues and help
+		name = murders_at_court.1001.d
+		custom_tooltip = murders_at_court.1001.d.tt
+		add_prestige = medium_prestige_loss
+		trigger_event = {
+			id = ek_daedric_artifacts.0038
+			days = { 300 365 }
+		}
+	}
+
+	option = { #Investigate it yourself!
+		name = murders_at_court.1001.e
+		custom_tooltip = murders_at_court.1001.e.tt
+		trigger = {
+			intrigue >= high_skill_rating
+		}
+		skill = intrigue
+		trigger_event = {
+			id = ek_daedric_artifacts.0038
+			days = { 300 365 }
+		}
+	}
+}
+
+ek_daedric_artifacts.0038 = {
+	type = character_event
+	title = murders_at_court.9001.t
+	desc = ek_daedric_artifacts.0038.desc
+	theme = death
+	override_background = {
+		event_background = sitting_room
+	}
+	left_portrait = {
+		character = root
+		animation = worry
+	}
+
+	immediate = {
+		random_living_character = {
+			limit = {
+				has_character_flag = tickles
+			}
+			save_scope_as = tickles
+		}
+	}
+
+	option = { #Confront them!
+		name = murders_at_court.9001.a
+		custom_tooltip = ek_daedric_artifacts.0038.a.tt
+		trigger_event = {
+			id = ek_daedric_artifacts.0039
+			days = { 7 14 }
+		}
+	}
+
+	option = { #Do nothing
+		name = murders_at_court.9001.b
+		flavor = murders_at_court.9001.b.tt
+		trigger_event = {
+			id = ek_daedric_artifacts.0036
+			days = { 7 14 }
+		}
+	}
+}
+
+ek_daedric_artifacts.0039 = {
+	type = character_event
+	title = ek_daedric_artifacts.0039.t
+	desc = ek_daedric_artifacts.0039.desc
+	theme = death
+	left_portrait = {
+		character = root
+		animation = disbelief
+	}
+	right_portrait = {
+		character = scope:tickles
+		animation = schadenfreude
+	}
+
+	immediate = {
+		random_living_character = {
+			limit = {
+				has_character_flag = tickles
+			}
+			save_scope_as = tickles
+		}
+		scope:tickles = {
+			remove_trait = disfigured
+		}
+	}
+
+	option = { #become tickles
+		name = ek_daedric_artifacts.0039.a
+		change_first_name = Tickles
+		set_nickname_effect = {	NICKNAME = nick_jester }
+		add_character_flag = {	flag = tickles	}
+		add_trait = champion_sheogorath
+		save_scope_as = sheogoraths_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:sheogoraths_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0058 # Someone has become Sheogorath's Champion
+		}
+		add_character_flag = sheogorath_conversion
+		add_piety_level = -1
+		stress_impact = { zealous = major_stress_impact_gain }
+		create_artifact_wabbajack_effect = { OWNER = ROOT }
+		scope:tickles = {
+			silent_disappearance_effect = yes
+		}
+		
+	}
+
+	option = { # confess
+		name = ek_daedric_artifacts.0039.b
+		scope:tickles = {
+			silent_disappearance_effect = yes
+		}
+		add_piety = minor_piety_gain
+		add_trait = murderer
+		add_character_modifier = sheogoraths_wrath
+		add_character_flag = make_suicide_available
+		ai_chance = {
+			base = 50
+			ai_value_modifier = {
+				ai_honor = 0.75
+			}
+		}
+	}
+
+	option = { # refuse reality
+		name = ek_daedric_artifacts.0039.c
+		give_sheogorath_worshipper_secret_or_trait_effect = yes
+		scope:tickles = {
+			add_trait = disfigured
+		}
+		if = {
+			limit = {
+				has_trait = lunatic
+			}
+			add_prestige = medium_prestige_loss
+		}
+		else = {
+			add_trait = lunatic_1
+		}
+	}
+}
+
+# Minor Unlock Potential Event
+ek_daedric_artifacts.0040 = {
+	type = character_event
+	title = ek_daedric_artifacts.0040.t
+	desc = ek_daedric_artifacts.0040.desc
+	
+	left_portrait = {
+		character = root
+	}
+
+	artifact = {
+		target = scope:shadow_key
+		position = lower_left_portrait
+		trigger = { exists = scope:shadow_key }
+	}
+
+	theme = secret
+
+	immediate = {
+		random_equipped_character_artifact = {
+			limit = {
+				has_variable = shadow_key
+			}
+			save_scope_as = shadow_key
+		}
+	}
+
+	option = { # unlock
+		name = ek_daedric_artifacts.0040.a
+		ek_rank_up_education_effect = yes
+		if = {
+			limit = {
+				has_trait = education_magical_ability
+			}
+			add_magic_lifestyle_xp = massive_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_learning
+			}
+			add_learning_lifestyle_xp = massive_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_intrigue
+			}
+			add_intrigue_lifestyle_xp = massive_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_martial
+			}
+			add_martial_lifestyle_xp = massive_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_diplomacy
+			}
+			add_diplomacy_lifestyle_xp = massive_lifestyle_xp
+		}
+		if = {
+			limit = {
+				has_trait = education_stewardship
+			}
+			add_stewardship_lifestyle_xp = massive_lifestyle_xp
+		}
+		scope:shadow_key = {
+			destroy_artifact = this 
+		}
+	}
+
+	option = { # i'd rather keep it
+		name = ek_daedric_artifacts.0040.b
+	}
+}
+
+# Bane of Daedra
+ek_daedric_artifacts.0041 = {
+	type = character_event
+	title = ek_daedric_artifacts.0041.t
+	desc = ek_daedric_artifacts.0041.desc
+	theme = martial
+	override_background = {
+		event_background = bedchamber
+	}
+	
+	left_portrait = {
+		character = root
+	}
+
+	artifact = {
+		target = scope:scourge
+		position = lower_left_portrait
+		trigger = { exists = scope:scourge }
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	weight_multiplier = {
+		base = 1
+		modifier = {
+			add = 1
+			has_character_modifier = malacaths_attention
+		}
+		modifier = {
+			add = -0.2
+			has_trait = deceitful
+		}
+		modifier = {
+			add = -0.2
+			has_trait = craven
+		}
+		modifier = {
+			add = -0.2
+			has_trait = forgiving
+		}
+		modifier = {
+			add = -0.2
+			has_trait = physique_bad
+		}
+		modifier = {
+			add = -0.2
+			has_trait = weak
+		}
+		modifier = {
+			add = 0.2
+			has_trait = wrathful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = brave
+		}
+		modifier = {
+			add = 0.2
+			has_trait = vengeful
+		}
+		modifier = {
+			add = 0.2
+			has_trait = physique_good
+		}
+		modifier = {
+			add = 0.2
+			has_trait = strong
+		}
+	}
+
+	trigger = {
+		is_daedric_champion = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = scourge_modifier
+		}
+
+		OR = {
+			culture = { has_cultural_pillar = heritage_goblinken }
+			culture = { has_cultural_pillar = heritage_orsimeri }
+		}
+
+		NOT = {
+			any_relation = {
+				type = friend
+			}
+		}
+	}
+
+	immediate = {
+		create_artifact_scourge_effect = { OWNER = ROOT }
+	}
+
+	# accept
+	option = {
+		name = ek_daedric_artifacts.0041.a
+		add_trait = champion_malacath
+		save_scope_as = malacaths_champion
+		every_player = {
+			limit = {
+				is_of_major_or_minor_interest_trigger = { CHARACTER = scope:malacaths_champion }
+			}
+			trigger_event = ek_daedric_artifacts.0059 # Someone has become Malacath's Champion
+		}
+		add_character_flag = malacath_conversion
+		if = {
+			limit = {
+				NOT = {
+					has_religion = religion:malacath_religion
+				}
+			}
+			add_piety_level = -1
+			stress_impact = { zealous = major_stress_impact_gain }
+		}
+	}
+
+	# no thanks
+	option = {
+		name = ek_daedric_artifacts.0041.b
+		destroy_artifact = scope:scourge
+		add_character_modifier = malacaths_wrath
+		add_character_flag = make_suicide_available
+	}
+}
+
+# Whom Gods Annoy
+ek_daedric_artifacts.0042 = {
+	type = character_event
+	title = ek_daedric_artifacts.0042.t
+	desc = ek_daedric_artifacts.0042.desc
+	theme = mental_health
+	override_background = {
+		event_background = throne_room
+	}
+	
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:spellsword
+	}
+
+	artifact = {
+		target = scope:staff_everscamp
+		position = lower_left_portrait
+		trigger = { exists = scope:staff_everscamp }
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = staff_everscamp_modifier
+		}
+	}
+
+	immediate = {
+		create_artifact_staff_everscamp_effect = { OWNER = ROOT }
+		create_character = {
+			faith = root.faith
+			culture = root.culture
+			location = root.capital_province
+			template = pool_repopulate_arcana
+			
+			save_scope_as = spellsword
+		}
+	}
+
+	# accept
+	option = {
+		name = ek_daedric_artifacts.0042.a
+		remove_short_term_gold = medium_gold_value
+		scope:spellsword = { silent_disappearance_effect = yes }
+	}
+
+	# no thanks
+	option = {
+		name = ek_daedric_artifacts.0042.b
+		destroy_artifact = scope:staff_everscamp
+		scope:spellsword = { silent_disappearance_effect = yes }
+		stress_impact = {
+			trusting = major_stress_impact_gain
+			ambitious = major_stress_impact_gain
+			greedy = major_stress_impact_loss
+		}
+	}
+}
+
+ek_daedric_artifacts.0043 = {
+	type = character_event
+	title = ek_daedric_artifacts.0042.t
+	desc = ek_daedric_artifacts.0043.desc
+	theme = mental_health
+	override_background = {
+		event_background = study
+	}
+	
+	left_portrait = {
+		character = root
+	}
+
+	artifact = {
+		target = scope:staff_everscamp
+		position = lower_left_portrait
+		trigger = { exists = scope:staff_everscamp }
+	}
+
+	immediate = {
+		every_character_artifact = {
+			limit = { has_artifact_modifier = staff_everscamp_modifier }
+			save_scope_as = staff_everscamp
+		}
+		scope:staff_everscamp = {
+			set_artifact_name = artifact_staff_everscamp_true_name
+			set_artifact_description = artifact_staff_everscamp_true_description
+		}
+		add_character_modifier = {
+			modifier = everscamps_modifier
+		}
+		add_character_flag = everscamp_decoded
+	}
+
+
+	# accept
+	option = {
+		name = ek_daedric_artifacts.0043.a
+	}
+}
+
+ek_daedric_artifacts.0044 = {
+	type = character_event
+	title = ek_daedric_artifacts.0042.t
+	desc = ek_daedric_artifacts.0044.desc
+	theme = mental_health
+	override_background = {
+		event_background = study
+	}
+	
+	left_portrait = {
+		character = root
+		animation = stress
+	}
+
+	artifact = {
+		target = scope:staff_everscamp
+		position = lower_left_portrait
+		trigger = { exists = scope:staff_everscamp }
+	}
+
+	immediate = {
+		every_character_artifact = {
+			limit = { has_artifact_modifier = staff_everscamp_modifier }
+			save_scope_as = staff_everscamp
+		}
+		root.capital_barony = {
+			save_temporary_scope_as = start_barony
+		}
+		# Calculate distance to the target holy site
+		# The value set indicates how many Journey Events a character will get
+		if = {
+			limit = {
+				scope:start_barony = {
+					squared_distance = {
+						target = title:c_darkfathom
+						value > long_pilgrimage_max_length
+					}
+				}
+			}
+			set_variable = {
+				name = travel_distance
+				value = 4
+			}
+		}
+		else_if = {
+			limit = {
+				scope:start_barony = {
+					squared_distance = {
+						target = title:c_darkfathom
+						value > medium_pilgrimage_max_length
+					}
+				}
+			}
+			set_variable = {
+				name = travel_distance
+				value = 3
+			}
+		}
+		else_if = {
+			limit = {
+				scope:start_barony = {
+					squared_distance = {
+						target = title:c_darkfathom
+						value > short_pilgrimage_max_length
+					}
+				}
+			}
+			set_variable = {
+				name = travel_distance
+				value = 2
+			}
+		}
+		else = {
+			set_variable = {
+				name = travel_distance
+				value = 1
+			}
+		}
+	}
+
+	# accept
+	option = {
+		name = ek_daedric_artifacts.0044.a
+		switch = {
+			trigger = var:travel_distance
+			1 = {
+				remove_short_term_gold = pilgrimage_minimum_cost
+			}
+			2 = {
+				remove_short_term_gold = pilgrimage_medium_extra_cost
+			}
+			3 = {
+				remove_short_term_gold = pilgrimage_long_extra_cost
+			}
+			4 = {
+				remove_short_term_gold = pilgrimage_very_long_extra_cost
+			}
+		}
+		stress_impact = {
+			stubborn = major_stress_impact_loss
+			fickle = major_stress_impact_gain
+			base = major_stress_impact_gain
+		}
+		trigger_event = {
+			id = ek_daedric_artifacts.0045
+			days = { 7 30 }
+		}
+	}
+	# back down
+	option = {
+		name = ek_daedric_artifacts.0044.b
+		stress_impact = {
+			stubborn = major_stress_impact_gain
+			fickle = major_stress_impact_loss
+			base = major_stress_impact_loss
+		}
+	}
+}
+
+ek_daedric_artifacts.0045 = {
+	type = character_event
+	title = ek_daedric_artifacts.0042.t
+	desc = ek_daedric_artifacts.0045.desc
+	theme = mental_health
+	override_background = {
+		event_background = wilderness_scope
+	}
+	
+	left_portrait = {
+		character = root
+		animation = stress
+	}
+
+	artifact = {
+		target = scope:staff_everscamp
+		position = lower_left_portrait
+		trigger = { exists = scope:staff_everscamp }
+	}
+
+	immediate = {
+		every_character_artifact = {
+			limit = { has_artifact_modifier = staff_everscamp_modifier }
+			save_scope_as = staff_everscamp
+		}
+	}
+
+	# destroy it
+	option = {
+		name = ek_daedric_artifacts.0045.a
+		stress_impact = {
+			stubborn = major_stress_impact_loss
+			fickle = major_stress_impact_gain
+			base = major_stress_impact_gain
+		}
+		trigger_event = {
+			id = ek_daedric_artifacts.0046
+			days = { 7 30 }
+		}
+		remove_character_modifier = everscamps_modifier
+		destroy_artifact = scope:staff_everscamp
+	}
+
+	# back down
+	option = {
+		name = ek_daedric_artifacts.0045.b
+		stress_impact = {
+			stubborn = major_stress_impact_gain
+			fickle = major_stress_impact_loss
+			base = major_stress_impact_loss
+		}
+	}
+}
+
+ek_daedric_artifacts.0046 = {
+	type = character_event
+	title = ek_daedric_artifacts.0046.t
+	desc = ek_daedric_artifacts.0046.desc
+	theme = mental_health
+	
+	left_portrait = {
+		character = root
+	}
+
+
+	# phew
+	option = {
+		name = ek_daedric_artifacts.0046.a
+		stress_impact = {
+			base = major_stress_impact_loss
+		}
+		add_character_modifier = {
+			modifier = learned_to_let_go
+			years = 20
+		}
+	}
+}
+
+#Someone became Vaermina's Champion
+ek_daedric_artifacts.0047 = {
+	type = character_event
+	title = ek_daedric_artifacts.0047.t
+	desc = ek_daedric_artifacts.0047.desc
+	theme = faith
+	left_portrait = {
+		character = scope:vaerminas_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:vaerminas_champion = {
+				add_trait_force_tooltip = champion_vaermina
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0047.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:vaerminas_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0047.a.distant
+		}
+	}
+}
+
+#Someone became Sanguine's Champion
+ek_daedric_artifacts.0048 = {
+	type = character_event
+	title = ek_daedric_artifacts.0048.t
+	desc = ek_daedric_artifacts.0048.desc
+	theme = faith
+	left_portrait = {
+		character = scope:sanguines_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:sanguines_champion = {
+				add_trait_force_tooltip = champion_sanguine
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0048.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:sanguines_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0048.a.distant
+		}
+	}
+}
+
+#Someone became Hircine's Champion
+ek_daedric_artifacts.0049 = {
+	type = character_event
+	title = ek_daedric_artifacts.0049.t
+	desc = ek_daedric_artifacts.0049.desc
+	theme = faith
+	left_portrait = {
+		character = scope:hircines_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:hircines_champion = {
+				add_trait_force_tooltip = champion_hircine
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0049.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:hircines_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0049.a.distant
+		}
+	}
+}
+
+#Someone became Meridia's Champion
+ek_daedric_artifacts.0050 = {
+	type = character_event
+	title = ek_daedric_artifacts.0050.t
+	desc = ek_daedric_artifacts.0050.desc
+	theme = faith
+	left_portrait = {
+		character = scope:meridias_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:meridias_champion = {
+				add_trait_force_tooltip = champion_meridia
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0050.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:meridias_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0050.a.distant
+		}
+	}
+}
+
+#Someone became Boethiah's Champion
+ek_daedric_artifacts.0051 = {
+	type = character_event
+	title = ek_daedric_artifacts.0051.t
+	desc = ek_daedric_artifacts.0051.desc
+	theme = faith
+	left_portrait = {
+		character = scope:boethiahs_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:boethiahs_champion = {
+				add_trait_force_tooltip = champion_boethiah
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0051.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:boethiahs_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0051.a.distant
+		}
+	}
+}
+
+#Someone became Molag's Champion
+ek_daedric_artifacts.0052 = {
+	type = character_event
+	title = ek_daedric_artifacts.0052.t
+	desc = ek_daedric_artifacts.0052.desc
+	theme = faith
+	left_portrait = {
+		character = scope:molags_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:molags_champion = {
+				add_trait_force_tooltip = champion_molag
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0052.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:molags_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0052.a.distant
+		}
+	}
+}
+
+#Someone became Azura's Champion
+ek_daedric_artifacts.0053 = {
+	type = character_event
+	title = ek_daedric_artifacts.0053.t
+	desc = ek_daedric_artifacts.0053.desc
+	theme = faith
+	left_portrait = {
+		character = scope:azuras_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:azuras_champion = {
+				add_trait_force_tooltip = champion_azura
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0053.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:azuras_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0053.a.distant
+		}
+	}
+}
+
+#Someone became Clavicus' Champion
+ek_daedric_artifacts.0054 = {
+	type = character_event
+	title = ek_daedric_artifacts.0054.t
+	desc = ek_daedric_artifacts.0054.desc
+	theme = faith
+	left_portrait = {
+		character = scope:clavicus_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:clavicus_champion = {
+				add_trait_force_tooltip = champion_clavicus
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0054.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:clavicus_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0054.a.distant
+		}
+	}
+}
+
+#Someone became Mehrunes' Champion
+ek_daedric_artifacts.0055 = {
+	type = character_event
+	title = ek_daedric_artifacts.0055.t
+	desc = ek_daedric_artifacts.0055.desc
+	theme = faith
+	left_portrait = {
+		character = scope:mehrunes_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:mehrunes_champion = {
+				add_trait_force_tooltip = champion_mehrunes
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0055.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:mehrunes_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0055.a.distant
+		}
+	}
+}
+
+#Someone became Hermaeus' Champion
+ek_daedric_artifacts.0056 = {
+	type = character_event
+	title = ek_daedric_artifacts.0056.t
+	desc = ek_daedric_artifacts.0056.desc
+	theme = faith
+	left_portrait = {
+		character = scope:hermaeus_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:hermaeus_champion = {
+				add_trait_force_tooltip = champion_hermaeus
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0056.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:hermaeus_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0056.a.distant
+		}
+	}
+}
+
+#Someone became Namira's Champion
+ek_daedric_artifacts.0057 = {
+	type = character_event
+	title = ek_daedric_artifacts.0057.t
+	desc = ek_daedric_artifacts.0057.desc
+	theme = faith
+	left_portrait = {
+		character = scope:namiras_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:namiras_champion = {
+				add_trait_force_tooltip = champion_namira
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0057.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:namiras_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0057.a.distant
+		}
+	}
+}
+
+#Someone became Sheogorath's Champion
+ek_daedric_artifacts.0058 = {
+	type = character_event
+	title = ek_daedric_artifacts.0058.t
+	desc = ek_daedric_artifacts.0058.desc
+	theme = faith
+	left_portrait = {
+		character = scope:sheogoraths_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:sheogoraths_champion = {
+				add_trait_force_tooltip = champion_sheogorath
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0058.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:sheogoraths_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0058.a.distant
+		}
+	}
+}
+
+#Someone became Malacath's Champion
+ek_daedric_artifacts.0059 = {
+	type = character_event
+	title = ek_daedric_artifacts.0059.t
+	desc = ek_daedric_artifacts.0059.desc
+	theme = faith
+	left_portrait = {
+		character = scope:malacaths_champion
+	}
+
+	immediate = {
+		play_music_cue = "mx_cue_combat_2"
+		show_as_tooltip = {
+			scope:malacaths_champion = {
+				add_trait_force_tooltip = champion_malacath
+			}
+		}
+	}
+
+	option = {
+		name = {
+			text = ek_daedric_artifacts.0059.a.neighbor
+			trigger = {
+				any_neighboring_top_liege_realm_owner = {
+					this = scope:malacaths_champion
+				}
+			}
+		}
+		name = {
+			text = ek_daedric_artifacts.0059.a.distant
+		}
+	}
+}
+
+ek_daedric_artifacts.9999 = { #daedric artifact cleanup
+	hidden = yes
+	immediate = {
+		every_character_artifact = {
+			limit = {
+				has_variable = daedric_artifact
+			}
+			destroy_artifact = this
+		}
+	}
+}
