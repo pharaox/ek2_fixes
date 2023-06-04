@@ -2958,19 +2958,21 @@ ek_daedric_artifacts.0031 = {
 	}	
 
 	trigger = {
-		OR = {
-			any_neighboring_top_liege_realm_owner = {
+		trigger_if = {
+			limit = {
+				is_independent_ruler = no
+			}
+			any_liege_or_above = {
 				is_ai = yes
 				prowess >= root.prowess
 				age > 16
 			}
-			AND = {
-				is_independent_ruler = no
-				any_liege_or_above = {
-					is_ai = yes
-					prowess >= root.prowess
-					age > 16
-				}
+		}
+		trigger_else = {
+			any_neighboring_top_liege_realm_owner = {
+				is_ai = yes
+				prowess >= root.prowess
+				age > 16
 			}
 		}
 		has_focus = martial_chivalry_focus
