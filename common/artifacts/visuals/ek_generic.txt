@@ -102,6 +102,18 @@ bow = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
 		reference = ep1_western_spear_01_a_portrait_entity
 	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ep1_western_spear_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ep1_western_spear_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
+		reference = ep1_western_spear_01_a_portrait_entity
+	}
 }
 
 staff = {
@@ -144,6 +156,18 @@ staff = {
 	}
 	asset = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
+		reference = ek_generic_staff_01_b_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ek_generic_staff_01_b_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ek_generic_staff_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
 		reference = ek_generic_staff_01_b_portrait_entity
 	}
 }

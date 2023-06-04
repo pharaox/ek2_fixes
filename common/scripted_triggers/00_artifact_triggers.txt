@@ -276,6 +276,18 @@ artifact_use_morc_unit_visuals_trigger = {
 	exists = culture
 	culture = {	has_unit_gfx = morc_unit_gfx }
 }
+artifact_use_altmer_unit_visuals_trigger = {
+	exists = culture
+	culture = {	has_unit_gfx = altmer_unit_gfx }
+}
+artifact_use_argonian_unit_visuals_trigger = {
+	exists = culture
+	culture = {	has_unit_gfx = argonian_unit_gfx }
+}
+artifact_use_khajiit_unit_visuals_trigger = {
+	exists = culture
+	culture = {	has_unit_gfx = khajiit_unit_gfx }
+}
 
 # EK EDIT: Added our own building gfx
 # EK TODO: Make our own triggers
@@ -285,7 +297,6 @@ artifact_use_indian_building_visuals_trigger = {
 	culture = {
 		OR = {
 			has_building_gfx = ek_khajiit_building_gfx
-			has_building_gfx = ek_daedric_building_gfx
 			has_building_gfx = ek_daedric_building_gfx
 			
 			has_building_gfx = ek_armun_an_building_gfx
@@ -305,6 +316,7 @@ artifact_use_mena_building_visuals_trigger = {
 	culture = { 
 		OR = {
 			has_building_gfx = ek_yokudan_building_gfx
+			has_building_gfx = ek_redguard_building_gfx
 			has_building_gfx = ek_dwemer_building_gfx
 			has_building_gfx = ek_aldmer_building_gfx
 			has_building_gfx = ek_balfieri_building_gfx
@@ -328,6 +340,7 @@ artifact_use_iberian_building_visuals_trigger = {
 	culture = { 
 		OR = {
 			has_building_gfx = ek_yokudan_building_gfx
+			has_building_gfx = ek_redguard_building_gfx
 		}
 	}
 }
@@ -339,8 +352,6 @@ artifact_use_western_building_visuals_trigger = {
 			has_building_gfx = ek_nedic_north_building_gfx
 			has_building_gfx = ek_nedic_south_building_gfx
 			has_building_gfx = ek_breton_building_gfx
-			
-			
 		}
 	}
 }
@@ -350,6 +361,7 @@ artifact_use_norse_building_visuals_trigger = {
 	culture = {
 		OR = { 
 			has_building_gfx = ek_nordic_building_gfx
+			has_building_gfx = ek_westholder_building_gfx
 		}
 	}
 }

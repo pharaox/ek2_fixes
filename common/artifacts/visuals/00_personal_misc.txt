@@ -595,6 +595,60 @@ armor = {
 		}
 		reference = female_clothing_secular_indian_war_nobility_01_artifact_entity
 	}
+	asset = {
+		trigger = {
+			artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit }
+			scope:owner = {
+				is_male = yes
+			}
+		}
+		reference = male_clothing_secular_indian_war_nobility_01_artifact_entity
+	}
+	asset = {
+		trigger = {
+			scope:owner = {
+				is_female = yes
+			}
+			artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit }
+		}
+		reference = female_clothing_secular_indian_war_nobility_01_artifact_entity
+	}
+	asset = {
+		trigger = {
+			artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit }
+			scope:owner = {
+				is_male = yes
+			}
+		}
+		reference = male_clothing_secular_indian_war_nobility_01_artifact_entity
+	}
+	asset = {
+		trigger = {
+			scope:owner = {
+				is_female = yes
+			}
+			artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit }
+		}
+		reference = female_clothing_secular_indian_war_nobility_01_artifact_entity
+	}
+	asset = {
+		trigger = {
+			artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit }
+			scope:owner = {
+				is_male = yes
+			}
+		}
+		reference = male_clothing_secular_indian_war_nobility_01_artifact_entity
+	}
+	asset = {
+		trigger = {
+			scope:owner = {
+				is_female = yes
+			}
+			artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit }
+		}
+		reference = female_clothing_secular_indian_war_nobility_01_artifact_entity
+	}
 }
 
 brooch = {

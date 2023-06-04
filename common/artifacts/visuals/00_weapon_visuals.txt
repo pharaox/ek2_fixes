@@ -90,6 +90,24 @@
 		}
 		reference = ep1_western_axe_01_a_portrait_entity
 	}
+	asset = {
+		trigger = {
+			artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit }
+		}
+		reference = ep1_western_axe_01_a_portrait_entity
+	}
+	asset = {
+		trigger = {
+			artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit }
+		}
+		reference = ep1_western_axe_01_a_portrait_entity
+	}
+	asset = {
+		trigger = {
+			artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit }
+		}
+		reference = ep1_western_axe_01_a_portrait_entity
+	}
 }
 
 hammer = {
@@ -135,6 +153,18 @@ hammer = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
 		reference = ep1_western_hammer_01_a_portrait_entity
 	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ep1_western_hammer_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ep1_western_hammer_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
+		reference = ep1_western_hammer_01_a_portrait_entity
+	}
 }
 
 spear = {
@@ -178,6 +208,18 @@ spear = {
 	}
 	asset = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
+		reference = ep1_western_spear_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ep1_western_spear_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ep1_western_spear_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
 		reference = ep1_western_spear_01_a_portrait_entity
 	}
 }
@@ -255,6 +297,18 @@ mace = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
 		reference = ep1_western_mace_01_a_portrait_entity
 	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ep1_western_mace_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ep1_western_mace_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
+		reference = ep1_western_mace_01_a_portrait_entity
+	}
 }
 
 dagger = {
@@ -302,6 +356,18 @@ dagger = {
 	}
 	asset = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
+		reference = ep1_western_dagger_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ep1_western_dagger_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ep1_western_dagger_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
 		reference = ep1_western_dagger_01_a_portrait_entity
 	}
 }
@@ -423,6 +489,18 @@ sword = {
 	}
 	asset = {
 		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = morc_unit } }
+		reference = ep1_western_sword_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = altmer_unit } }
+		reference = ep1_western_sword_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = argonian_unit } }
+		reference = ep1_western_sword_01_a_portrait_entity
+	}
+	asset = {
+		trigger = { artifact_should_use_gfx_type_trigger = { TYPE = khajiit_unit } }
 		reference = ep1_western_sword_01_a_portrait_entity
 	}
 }
