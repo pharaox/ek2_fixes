@@ -2062,8 +2062,6 @@ marriage_ai_accept_modifier = { ###MARRIAGE SCRIPTED MODIFIERS###
 	}
 }
 
-}
-
 elopment_ai_accept_modifier = { #Should copy marriage_ai_accept_modifier on relevant points, note: there are no secondary targets
 	############
 	# ELOPMENT #
@@ -2238,19 +2236,19 @@ elopment_ai_accept_modifier = { #Should copy marriage_ai_accept_modifier on rele
 							}
 						}
 					}
+					subtract = 15
 				}
-				subtract = 15
-			}
-			if = {
-				limit = {
-					scope:recipient.faith = {
-						faith_hostility_level = {
-							target = scope:actor.faith
-							value >= faith_hostility_prevents_marriage_level
+				if = {
+					limit = {
+						scope:recipient.faith = {
+							faith_hostility_level = {
+								target = scope:actor.faith
+								value >= faith_hostility_prevents_marriage_level
+							}
 						}
 					}
+					subtract = 975
 				}
-				subtract = 975
 			}
 		}
 		desc = MARRY_DIFFERENT_FAITH_REASON
