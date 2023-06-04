@@ -2002,20 +2002,14 @@ ArtifactAnimalType = {
 
 	text = {
 		trigger = {
-			OR = {
-				has_artifact_feature = animal_skull_type_giant_wasp
-				has_artifact_feature = animal_hide_type_giant_wasp
-			}
+			has_artifact_feature = animal_skull_type_giant_wasp
 		}
 		localization_key = animal_type_giant_wasp
 	}
 
 	text = {
 		trigger = {
-			OR = {
-				has_artifact_feature = animal_skull_type_kwama_warrior
-				has_artifact_feature = animal_hide_type_kwama_warrior
-			}
+			has_artifact_feature = animal_skull_type_kwama_warrior
 		}
 		localization_key = animal_type_kwama_warrior
 	}
