@@ -1,0 +1,26 @@
+﻿##Events that affect all governments in general
+
+namespace = govt
+
+#Hidden event to unlock contract negotiations after a set amount of time
+govt.0001 = {
+	type = character_event
+	hidden = yes
+	desc = govt.0001.desc
+	title = govt.0001.t
+	theme = crown
+	left_portrait = {
+		character = root
+		animation = worry
+	}
+	right_portrait = {
+		character = root.liege
+		animation = personality_callous
+	}
+	option = {
+		name = govt.0001.a
+	}
+	immediate = {
+		set_vassal_contract_modification_blocked = no
+	}
+}
