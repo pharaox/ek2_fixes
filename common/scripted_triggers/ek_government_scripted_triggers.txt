@@ -124,8 +124,8 @@ vassal_should_use_obligation = {
 	trigger_else_if = {
 		limit = { $OBLIGATION_LEVEL$ = flag:devotion }
 		custom_tooltip = {
+			text = devotion_obligations_requirement
 			OR = {
-				text = devotion_obligations_requirement
 				scope:vassal = {
 					can_use_obligation_devotion = yes
 					NOT = { has_unique_obligation_level = yes }
