@@ -20,6 +20,12 @@ govt.0001 = {
 	option = {
 		name = govt.0001.a
 	}
+	trigger = {
+		exists = liege
+		is_ruler = yes
+		vassal_contract_has_modifiable_obligations = yes
+		vassal_contract_is_blocked_from_modification = yes
+	}
 	immediate = {
 		set_vassal_contract_modification_blocked = no
 	}
