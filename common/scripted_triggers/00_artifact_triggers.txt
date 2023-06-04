@@ -208,8 +208,9 @@ artifact_needs_material_wood_trigger = {
 
 # UnitGFX-based triggers
 artifact_use_african_unit_visuals_trigger = {
-	exists = culture
-	culture = { has_unit_gfx = sub_sahran_unit_gfx }
+	always = no
+	# exists = culture
+	# culture = { has_unit_gfx = sub_sahran_unit_gfx }
 }
 
 artifact_use_eastern_unit_visuals_trigger = {
@@ -2258,7 +2259,7 @@ sword_unique_gfx_trigger = {
 			has_clothing_gfx = ek_nedic_north_clothing_gfx
 			has_clothing_gfx = ek_nedic_reach_clothing_gfx
 			has_clothing_gfx = ek_akaviri_clothing_gfx
-			has_clothing_gfx = byzantine_clothing_gfx
+			# has_clothing_gfx = byzantine_clothing_gfx
 			has_clothing_gfx = ek_pellitinian_clothing_gfx
 			has_clothing_gfx = ek_yokudan_clothing_gfx
 			has_clothing_gfx = ek_redguard_clothing_gfx

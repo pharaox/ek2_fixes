@@ -43,8 +43,9 @@ coa_bishopric_trigger = {
 }
 
 coa_breton_trigger = {
-	OR = {
-		scope:culture = { has_coa_gfx = breton_coa_gfx }
+	always = no
+	# OR = {
+		# scope:culture = { has_coa_gfx = breton_coa_gfx }
 		# AND = {
 			# exists = scope:title
 			# scope:title = {
@@ -53,7 +54,7 @@ coa_breton_trigger = {
 				# }
 			# }
 		# }
-	}
+	# }
 }
 
 coa_byzantine_trigger = {
@@ -366,7 +367,7 @@ coa_germanic_trigger = {
 
 coa_iberian_trigger = {
 	OR = {
-		scope:culture = { has_coa_gfx = iberian_group_coa_gfx }
+		# scope:culture = { has_coa_gfx = iberian_group_coa_gfx }
 		AND = {
 			scope:culture = { has_coa_gfx = arabic_group_coa_gfx }
 			AND = {
