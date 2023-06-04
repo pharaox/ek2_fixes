@@ -1,0 +1,1497 @@
+﻿### Need two decisions for that, one which makes it lethal + mandatory and one that does not?
+# Pro: Easier to handle the two kinds of duels and contests
+# Con: Have to sync the two
+
+### Duel for a claim
+# Non-lethal, non-obligatory (without lethal_and_free_claim_duel_active)
+duel_for_claim_default_interaction = {
+	category = interaction_category_hostile
+	ai_maybe = yes
+	ai_max_reply_days = 0
+	popup_on_receive = yes
+	pause_on_receive = yes
+	can_send_despite_rejection = yes
+	
+	desc = duel_for_claim_default_interaction_desc
+	target_type = title
+	target_filter = recipient_domain_titles # You don't have to fight the top-liege to get a far away title
+	
+	is_shown = {
+		# You have a claim on someone's title
+		scope:actor = {
+			any_claim = {
+				is_title_created = yes
+				holder = scope:recipient
+			}
+		}
+		
+		# Must be part of their culture
+		scope:actor.culture = { has_cultural_parameter = unlock_duel_for_title }
+		scope:recipient.culture = { has_cultural_parameter = unlock_duel_for_title }
+		# The recipient faith does NOT have the lethal_and_free_claim_duel_active doctrine_parameter
+		NOT = { scope:recipient = { faith = { has_doctrine_parameter = lethal_and_free_claim_duel_active } } }
+	}
+
+	can_be_picked_title = {
+		scope:actor = { has_claim_on = scope:target }
+	}
+	
+	is_highlighted = {
+		# You have a decent shot at beating them
+		scope:actor = { prowess_diff = { target = scope:recipient value >= 5 } }
+	}
+	
+	is_valid_showing_failures_only = {
+		# Calc some stuff that might invalidate elsewhere before the bout is sorted.
+		rival_single_combat_shown_and_not_invalid_trigger = yes
+		# Scope:recipient must be able to fight personally.
+		scope:recipient = { can_start_single_combat_trigger = yes }
+		# Scope:recipient must not be banned from single combat.
+		scope:recipient = {
+			custom_description = {
+				text = fp1_tbc_recipient_banned_from_combat
+				can_start_single_combat_banned_checks_trigger = no
+			}
+		}
+		# Neither of the characters can be imprisoned.
+		scope:actor = { is_imprisoned = no }
+		scope:recipient = { is_imprisoned = no }
+	}
+	
+	can_send = {
+		scope:actor = {
+			custom_description = {
+				text = "character_interactions_hostile_actions_disabled_delay"
+				NOT = { has_character_flag = flag_hostile_actions_disabled_delay }
+			}
+		}
+	}
+	
+	on_accept = {
+		### We say what's going to happen
+		custom_tooltip = duel_for_claim_default_interaction.non_lethal.tt
+		
+		scope:actor = {
+			custom_tooltip = duel_for_claim_default_interaction.actor_victory.tt
+			custom_tooltip = duel_for_claim_default_interaction.actor_defeat.tt
+			if = {
+				limit = { scope:hook = yes }
+				use_hook = scope:recipient
+			}
+		}
+		
+		scope:recipient = {
+			if = {
+				limit = {
+					is_ai = no
+					NOT = {
+						any_realm_county = {
+							save_temporary_scope_as = temp_county
+							NOT = { scope:target = scope:temp_county }
+							NOT = { scope:target = { is_de_jure_liege_or_above_target = scope:temp_county } }
+						}
+					}
+				}
+				custom_tooltip = duel_for_claim_default_interaction.actor_victory_game_over.tt
+			}
+		}
+		
+		## We build here the lists of titles that we will take
+		scope:target = {
+			every_in_de_jure_hierarchy = {
+				limit = {
+					holder = scope:recipient
+				}
+				add_to_list = potential_titles_taken
+			}
+		}
+		
+		## Then try to take shirts off.
+		single_combat_apply_default_shirtlessness_effect = {
+			ATTACKER = scope:actor
+			DEFENDER = scope:recipient
+		}
+		
+		## Let's get this bread
+		configure_start_single_combat_effect = {
+			SC_INITIATOR = scope:actor
+			SC_ATTACKER = scope:actor
+			SC_DEFENDER = scope:recipient
+			FATALITY = no
+			FIXED = no
+			LOCALE = terrain_scope
+			OUTPUT_EVENT = ek_religious_interactions.0101
+			INVALIDATION_EVENT = perk_interaction.0102
+		}
+	}
+	
+	on_decline = {
+		scope:actor = {
+			# Inform them of the decline
+			send_interface_toast = {
+				title = duel_for_claim_default_interaction.challenge_rejected.t
+				left_icon = scope:recipient
+				right_icon = scope:actor
+			}
+			
+			custom_tooltip = duel_for_claim_default_interaction.actor_default_victory.tt
+		}
+		
+		scope:recipient = {
+			stress_impact = {
+				brave = medium_stress_impact_gain
+				arrogant = minor_stress_impact_gain
+			}
+		}
+	}
+	
+	cost = {
+		prestige = {
+			value = {
+				if = {
+					limit = { scope:target = { tier = tier_county } }
+					add = minor_prestige_value
+				}
+				else_if = {
+					limit = { scope:target = { tier = tier_duchy } }
+					add = medium_prestige_value
+				}
+				else_if = {
+					limit = { scope:target = { tier = tier_kingdom } }
+					add = major_prestige_value
+				}
+				else_if = {
+					limit = { scope:target = { tier = tier_empire } }
+					add = massive_prestige_value
+				}
+			}
+		}
+	}
+	
+#	auto_accept = {
+#		custom_description = {
+#			text = "spending_hook"
+#			subject = scope:actor
+#			object = scope:recipient
+#			scope:hook = yes
+#		}
+#	}
+
+	send_option = {
+		is_valid = {
+			scope:actor = {
+				has_usable_hook = scope:recipient
+			}
+		}
+		flag = hook
+		localization = GENERIC_SPEND_A_HOOK
+	}
+	should_use_extra_icon = {
+		scope:actor = { has_usable_hook = scope:recipient }
+	}
+	extra_icon = "gfx/interface/icons/character_interactions/hook_icon.dds"
+
+	send_options_exclusive = no
+	
+	ai_accept = { # Heavily based on challenge_to_single_combat_interaction
+		base = 0
+		
+		# Prowess diff
+		modifier = {
+			desc = CTSC_RELATIVE_PROWESS
+			scope:actor.prowess < scope:recipient.prowess
+			add = {
+				value = scope:recipient.prowess
+				subtract = scope:actor.prowess
+				multiply = 2
+			}
+		}
+		modifier = {
+			desc = CTSC_RELATIVE_PROWESS
+			scope:recipient.prowess < scope:actor.prowess
+			add = {
+				value = scope:actor.prowess
+				subtract = scope:recipient.prowess
+				multiply = -2
+			}
+		}
+		#Weak hook: extra points
+		modifier = {
+			scope:hook = yes
+			add = 50
+			scope:actor = { NOT = { has_strong_hook = scope:recipient } }
+			desc = SCHEME_WEAK_HOOK_USED
+		}
+		#Strong hook: more points
+		modifier = {
+			scope:hook = yes
+			add = 75
+			scope:actor = { NOT = { has_weak_hook = scope:recipient } }
+			desc = SCHEME_STRONG_HOOK_USED
+		}
+		# Bravery
+		ai_value_modifier = {
+			who = scope:recipient
+			ai_boldness = {
+				if = {
+					limit = {
+						scope:recipient = {
+							ai_boldness > 0
+							ai_rationality < 0
+						}
+					}
+					value = 2
+				}
+				else_if = {
+					limit = {
+						scope:recipient = {
+							NOT = { ai_boldness = 0 }
+						}
+					}
+					value = 1
+				}
+			}
+			ai_vengefulness = {
+				if = {
+					limit = {
+						scope:recipient = {
+							NOT = { ai_vengefulness = 0 }
+						}
+					}
+					value = 0.75
+				}
+			}
+			ai_honor = {
+				if = {
+					limit = {
+						scope:recipient = {
+							ai_honor > 0
+						}
+					}
+					value = 0.5
+				}
+			}
+		}
+	}
+	
+	ai_potential = {
+		any_claim = { exists = this }
+		NOT = { has_trait = craven }
+		is_imprisoned = no
+		can_start_single_combat_trigger = yes
+	}
+	
+	ai_targets = {
+		ai_recipients = neighboring_rulers
+	}
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	
+	ai_frequency = 60
+
+	ai_will_do = {
+		base = -50
+		
+		# Factor for personality (excluding realism).
+		modifier = {
+			add = {
+				value = ai_boldness
+				multiply = 1
+			}
+		}
+		modifier = { add = ai_vengefulness }
+		modifier = {
+			add = {
+				value = ai_energy
+				multiply = -0.25
+			}
+		}
+		# Don't challenge kinslayer-counting family, unless they're your nemesis.
+		modifier = {
+			scope:actor = {
+				murdering_character_is_kinslaying_in_faith_trigger = {
+					CHARACTER = scope:recipient
+					FAITH = scope:actor.faith
+				}
+			}
+			scope:recipient = {
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge your spouse, unless they're your nemesis.
+		modifier = {
+			scope:recipient = {
+				is_spouse_of = scope:actor
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge people hopelessly out of your league unless you're really, really not seeing things clearly.
+		modifier = {
+			scope:actor = {
+				prowess_diff = {
+					target = scope:recipient
+					value <= -15
+				}
+				ai_rationality >= high_negative_ai_value
+			}
+			add = -1000
+		}
+
+		# The AI will always use a hook if it can
+		modifier = {
+			scope:hook = yes
+			add = 1
+		}
+	}
+}
+
+# Lethal and obligatory
+duel_for_claim_strong_interaction = {
+	category = interaction_category_hostile
+	ai_maybe = yes
+	ai_max_reply_days = 0
+	popup_on_receive = yes
+	pause_on_receive = yes
+	can_send_despite_rejection = yes
+	
+	desc = duel_for_claim_interaction_desc
+	target_type = title
+	target_filter = recipient_domain_titles # You don't have to fight the top-liege to get a far away title
+	
+	is_shown = {
+		# You have a claim on someone's title
+		scope:actor = {
+			any_claim = {
+				is_title_created = yes
+				holder = scope:recipient
+			}
+		}
+		
+		# The recipient faith MUST HAVE the lethal_and_free_claim_duel_active doctrine_parameter (see: Hakkvild & Yashnag)
+		scope:recipient = { faith = { has_doctrine_parameter = lethal_and_free_claim_duel_active } }
+	}
+
+	can_be_picked_title = {
+		scope:actor = { has_claim_on = scope:target }
+	}
+	
+	is_highlighted = {
+		# You have a decent shot at beating them
+		scope:actor = { prowess_diff = { target = scope:recipient value >= 5 } }
+	}
+	
+	is_valid_showing_failures_only = {
+		# Calc some stuff that might invalidate elsewhere before the bout is sorted.
+		rival_single_combat_shown_and_not_invalid_trigger = yes
+		# Scope:recipient must be able to fight personally.
+		scope:recipient = { can_start_single_combat_trigger = yes }
+		# Scope:recipient must not be banned from single combat.
+		scope:recipient = {
+			custom_description = {
+				text = fp1_tbc_recipient_banned_from_combat
+				can_start_single_combat_banned_checks_trigger = no
+			}
+		}
+		# Neither of the characters can be imprisoned.
+		scope:actor = { is_imprisoned = no }
+		scope:recipient = { is_imprisoned = no }
+	}
+	
+	can_send = {
+		scope:actor = {
+			custom_description = {
+				text = "character_interactions_hostile_actions_disabled_delay"
+				NOT = { has_character_flag = flag_hostile_actions_disabled_delay }
+			}
+		}
+	}
+	
+	on_accept = {
+		### We say what's going to happen
+		custom_tooltip = duel_for_claim_strong_interaction.lethal.tt
+		
+		scope:actor = {
+			custom_tooltip = duel_for_claim_strong_interaction.actor_victory.tt
+			custom_tooltip = duel_for_claim_strong_interaction.actor_defeat.tt
+		}
+		
+		scope:recipient = {
+			if = {
+				limit = {
+					is_ai = no
+					NOT = {
+						any_realm_county = {
+							save_temporary_scope_as = temp_county
+							NOT = { scope:target = scope:temp_county }
+							NOT = { scope:target = { is_de_jure_liege_or_above_target = scope:temp_county } }
+						}
+					}
+				}
+				custom_tooltip = duel_for_claim_strong_interaction.actor_victory_game_over.tt
+			}
+		}
+		
+		## We build here the lists of titles that we will take
+		scope:target = {
+			every_in_de_jure_hierarchy = {
+				limit = {
+					holder = scope:recipient
+				}
+				add_to_list = potential_titles_taken
+			}
+		}
+		
+		## Then try to take shirts off.
+		single_combat_apply_default_shirtlessness_effect = {
+			ATTACKER = scope:actor
+			DEFENDER = scope:recipient
+		}
+		
+		## Let's get this bread
+		configure_start_single_combat_effect = {
+			SC_INITIATOR = scope:actor
+			SC_ATTACKER = scope:actor
+			SC_DEFENDER = scope:recipient
+			FATALITY = always
+			FIXED = no
+			LOCALE = terrain_scope
+			OUTPUT_EVENT = ek_religious_interactions.0101
+			INVALIDATION_EVENT = perk_interaction.0102
+		}
+	}
+	
+	on_decline = {
+		scope:actor = {
+			# Inform them of the decline
+			send_interface_toast = {
+				title = duel_for_claim_interaction.challenge_rejected.t
+				left_icon = scope:recipient
+				right_icon = scope:actor
+			}
+			
+			custom_tooltip = duel_for_claim_strong_interaction.actor_default_victory.tt
+			hidden_effect = {
+				# You get the title and all de jure vassals held by the defender
+				create_title_and_vassal_change = {
+					type = conquest_claim
+					save_scope_as = change
+					add_claim_on_loss = yes
+				}
+				
+				scope:target = {
+					every_in_de_jure_hierarchy = {
+						limit = {
+							holder = scope:recipient
+						}
+						add_to_list = titles_taken
+					}
+				}
+				
+				every_in_list = {
+					list = titles_taken
+					change_title_holder = {
+						holder = scope:actor
+						change = scope:change
+						take_baronies = yes
+					}
+				}
+		
+				resolve_title_and_vassal_change = scope:change
+			}
+		}
+		
+		scope:recipient = {
+			# If the recipient would lose all their titles, and they're a player, we tell them that refusing or losing would be a rather bad idea
+			if = {
+				limit = {
+					is_ai = no
+					NOT = {
+						any_realm_county = {
+							save_temporary_scope_as = temp_county
+							NOT = { scope:target = scope:temp_county }
+							NOT = { scope:target = { is_de_jure_liege_or_above_target = scope:temp_county } }
+						}
+					}
+				}
+				custom_tooltip = duel_for_claim_strong_interaction.default_game_over.tt
+			}
+		}
+	}
+	
+	# No cost since it's part of our faith
+	
+	auto_accept = no
+	
+	ai_accept = { # Heavily based on challenge_to_single_combat_interaction
+		base = 0
+		
+		# Prowess diff
+		modifier = {
+			desc = CTSC_RELATIVE_PROWESS
+			scope:actor.prowess < scope:recipient.prowess
+			add = {
+				value = scope:recipient.prowess
+				subtract = scope:actor.prowess
+				multiply = 2
+			}
+		}
+		modifier = {
+			desc = CTSC_RELATIVE_PROWESS
+			scope:recipient.prowess < scope:actor.prowess
+			add = {
+				value = scope:actor.prowess
+				subtract = scope:recipient.prowess
+				multiply = -2
+			}
+		}
+		# Bravery
+		ai_value_modifier = {
+			who = scope:recipient
+			ai_boldness = {
+				if = {
+					limit = {
+						scope:recipient = {
+							ai_boldness > 0
+							ai_rationality < 0
+						}
+					}
+					value = 2
+				}
+				else_if = {
+					limit = {
+						scope:recipient = {
+							NOT = { ai_boldness = 0 }
+						}
+					}
+					value = 1
+				}
+			}
+			ai_vengefulness = {
+				if = {
+					limit = {
+						scope:recipient = {
+							NOT = { ai_vengefulness = 0 }
+						}
+					}
+					value = 0.75
+				}
+			}
+			ai_honor = {
+				if = {
+					limit = {
+						scope:recipient = {
+							ai_honor > 0
+						}
+					}
+					value = 0.5
+				}
+			}
+		}
+		# Tier of the title
+		modifier = {
+			desc = DUEL_FOR_CLAIM_TITLE_TIER
+			scope:target = { tier = tier_county }
+			add = 5
+		}
+		modifier = {
+			desc = DUEL_FOR_CLAIM_TITLE_TIER
+			scope:target = { tier = tier_duchy }
+			add = 10
+		}
+		modifier = {
+			desc = DUEL_FOR_CLAIM_TITLE_TIER
+			scope:target = { tier = tier_kingdom }
+			add = 15
+		}
+		modifier = {
+			desc = DUEL_FOR_CLAIM_TITLE_TIER
+			scope:target = { tier = tier_kingdom }
+			add = 20
+		}
+		
+		# The more titles you have, the less you care
+		# If you're the de Jure liege of your title, you don't want to lose it
+		modifier = {
+			desc = DUEL_FOR_CLAIM_DE_JURE_LIEGE
+			scope:target = {
+				any_this_title_or_de_jure_above = {
+					save_temporary_scope_as = current_title
+					
+					NOT = { scope:target = scope:current_title }
+					holder = scope:recipient
+				}
+			}
+			add = 20
+		}
+		# If it's your last county, you really don't want to lose it
+		modifier = {
+			desc = DUEL_FOR_CLAIM_LAST_TITLE
+			scope:target = {
+				NOT = {
+					any_realm_county = {
+						save_temporary_scope_as = temp_county
+						NOT = { scope:target = scope:temp_county }
+						NOT = { scope:target = { is_de_jure_liege_or_above_target = scope:temp_county } }
+					}
+				}
+			}
+			add = 15
+		}
+	}
+	
+	ai_potential = {
+		any_claim = { exists = this }
+		NOT = { has_trait = craven }
+		is_imprisoned = no
+		can_start_single_combat_trigger = yes
+	}
+	
+	ai_targets = {
+		ai_recipients = neighboring_rulers
+	}
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	
+	ai_frequency = 60
+
+	ai_will_do = {
+		base = -50
+		
+		# Factor for personality (excluding realism).
+		modifier = {
+			add = {
+				value = ai_boldness
+				multiply = 1
+			}
+		}
+		modifier = { add = ai_vengefulness }
+		modifier = {
+			add = {
+				value = ai_energy
+				multiply = -0.25
+			}
+		}
+		# Don't challenge kinslayer-counting family, unless they're your nemesis.
+		modifier = {
+			scope:actor = {
+				murdering_character_is_kinslaying_in_faith_trigger = {
+					CHARACTER = scope:recipient
+					FAITH = scope:actor.faith
+				}
+			}
+			scope:recipient = {
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge your spouse, unless they're your nemesis.
+		modifier = {
+			scope:recipient = {
+				is_spouse_of = scope:actor
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge people hopelessly out of your league unless you're really, really not seeing things clearly.
+		modifier = {
+			scope:actor = {
+				prowess_diff = {
+					target = scope:recipient
+					value <= -15
+				}
+				ai_rationality >= high_negative_ai_value
+			}
+			add = -1000
+		}
+	}
+}
+
+# Get a claim due to prowess
+prowess_claim_interaction = {
+	icon = icon_combat
+	category = interaction_category_diplomacy
+
+	desc = prowess_claim_interaction_desc
+	target_type = title
+	target_filter = recipient_domain_titles
+	ignores_pending_interaction_block = yes
+
+	is_shown = {
+		scope:actor = {
+			OR = {
+				faith = { has_doctrine_parameter = weak_rulers_contest_rule }
+				culture = { has_cultural_parameter = weak_rulers_contest_rule }
+			}
+			NOT = { target_is_liege_or_above = scope:recipient }
+			
+			any_realm_province = { county = { any_neighboring_county = { holder = scope:recipient } } }
+			
+		}
+		scope:actor = {
+			
+			NOT = { target_is_liege_or_above = scope:recipient }
+			
+			any_realm_province = { county = { any_neighboring_county = { holder = scope:recipient } } }
+		}
+		NOT = {
+			scope:actor = scope:recipient
+			scope:recipient.prowess >= scope:actor.prowess
+		}
+		scope:recipient = {
+			is_landed = yes
+			primary_title.tier > tier_barony
+			NOT = {	target_is_liege_or_above = scope:actor }
+		}
+	}
+
+	can_be_picked_title = {
+		scope:target = {
+			tier >= tier_county
+			tier <= tier_kingdom
+			
+			# You must border it
+			is_neighbor_to_realm = scope:actor
+			
+			# Must have at least one de jure county vassal (if not a county)
+			trigger_if = {
+				limit = { tier > tier_county }
+				any_in_de_jure_hierarchy = { tier = tier_county }
+			}
+		}
+	}
+	
+	is_valid_showing_failures_only = {
+		trigger_if = { # Can't request on titles you already have a claim on
+			limit = {
+				exists = scope:target
+				scope:actor = {
+					has_claim_on = scope:target
+				}
+			}
+			custom_description = {
+				text = buy_claim_has_pressed_claim_already
+				always = no
+			}
+		}
+		trigger_if = { # Can't request claims on baronies
+			limit = {
+				exists = scope:target
+				scope:target = {
+					tier = tier_barony
+				}
+			}
+			custom_description = {
+				text = "hof_ask_for_claim_no_baronies"
+				always = no
+			}
+		}
+		trigger_if = { # Can't buy Kingdom Claims if you're a King or Emperor
+			limit = {
+				exists = scope:target
+				scope:target = {
+					tier = tier_kingdom
+				}
+				scope:actor.highest_held_title_tier >= tier_kingdom
+			}
+			custom_description = {
+				text = buy_claim_no_king_or_emperor_kingdom
+				always = no
+			}
+		}
+		trigger_if = { # Can't buy Emperor Claims if you're already an Emperor
+			limit = {
+				exists = scope:target
+				scope:target = {
+					tier = tier_empire
+				}
+				scope:actor.highest_held_title_tier >= tier_empire
+			}
+			custom_description = {
+				text = buy_claim_no_emperor_empire
+				always = no
+			}
+		}
+		trigger_if = { # Can't buy claims on head of faith titles
+			limit = {
+				scope:target = {is_head_of_faith = yes}
+			}
+			custom_description = {
+				text = buy_claim_no_religious_titles
+				always = no
+			}
+		}
+		scope:recipient = { is_busy_in_events_localised = yes }
+		scope:recipient = { NOT = { has_strong_hook = scope:actor } }
+	}
+	
+	cost = {
+		prestige = {
+			value = {
+				add = minor_prestige_value
+				if = {
+					limit = { scope:target = { tier = tier_county } }
+					multiply = 2
+				}
+				if = {
+					limit = { scope:target = { tier = tier_duchy } }
+					multiply = 4
+				}
+				if = {
+					limit = { scope:target = { tier = tier_kingdom } }
+					multiply = 8
+				}
+				
+				multiply = prowess_claim_cost_modifier
+			}
+		}
+	}
+	
+	auto_accept = yes
+	
+	on_accept = {
+		scope:actor = {
+			send_interface_toast = {
+				title = buy_claim_interaction.message
+				left_icon = scope:actor
+				right_icon = scope:recipient
+
+				add_unpressed_claim = scope:target
+			}
+		}
+		scope:recipient = {
+			add_opinion = {
+				target = scope:actor
+				modifier = claimed_my_title_opinion
+				opinion = -40
+			}
+			# trigger_event = perk_interaction.0002
+		}
+	}
+	ai_potential = {
+		always = yes
+	}
+	
+	ai_targets = {
+		ai_recipients = neighboring_rulers
+	}
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	
+	ai_frequency = 60
+
+	ai_will_do = {
+		base = -20
+		
+		# Factor for personality (excluding realism).
+		modifier = {
+			add = {
+				value = ai_boldness
+				multiply = 1
+			}
+		}
+		modifier = { add = ai_vengefulness }
+		modifier = {
+			add = {
+				value = ai_energy
+				multiply = -0.25
+			}
+		}
+		# Don't challenge kinslayer-counting family, unless they're your nemesis.
+		modifier = {
+			scope:actor = {
+				murdering_character_is_kinslaying_in_faith_trigger = {
+					CHARACTER = scope:recipient
+					FAITH = scope:actor.faith
+				}
+			}
+			scope:recipient = {
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge your spouse, unless they're your nemesis.
+		modifier = {
+			scope:recipient = {
+				is_spouse_of = scope:actor
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge people hopelessly out of your league unless you're really, really not seeing things clearly.
+		modifier = {
+			scope:actor = {
+				prowess_diff = {
+					target = scope:recipient
+					value <= -15
+				}
+				ai_rationality >= high_negative_ai_value
+			}
+			add = -1000
+		}
+	}
+}
+
+# Get a claim due to arcana
+arcana_claim_interaction = {
+	category = interaction_category_diplomacy
+
+	desc = arcana_claim_interaction_desc
+	target_type = title
+	target_filter = recipient_domain_titles
+	ignores_pending_interaction_block = yes
+
+	is_shown = {
+		scope:actor = {
+			OR = {
+				culture = { has_cultural_parameter = arcana_claim_enabled }
+			}
+			NOT = { target_is_liege_or_above = scope:recipient }
+			
+			any_realm_province = { county = { any_neighboring_county = { holder = scope:recipient } } }
+			
+		}
+		scope:actor = {
+			
+			NOT = { target_is_liege_or_above = scope:recipient }
+			
+			any_realm_province = { county = { any_neighboring_county = { holder = scope:recipient } } }
+		}
+		NOT = {
+			scope:actor = scope:recipient
+			scope:recipient.arcana >= scope:actor.arcana
+		}
+		scope:recipient = {
+			is_landed = yes
+			primary_title.tier > tier_barony
+			NOT = {	target_is_liege_or_above = scope:actor }
+		}
+	}
+
+	can_be_picked_title = {
+		scope:target = {
+			custom_tooltip = {
+				text = arcana_claim_tier_trigger
+				tier >= tier_county
+				tier <= tier_kingdom
+			}	
+			
+			# You must border it
+			is_neighbor_to_realm = scope:actor
+			
+			# Must have at least one de jure county vassal (if not a county)
+			trigger_if = {
+				limit = { tier > tier_county }
+				any_in_de_jure_hierarchy = { tier = tier_county }
+			}
+		}
+	}
+	
+	is_valid_showing_failures_only = {
+		trigger_if = { # Can't request on titles you already have a claim on
+			limit = {
+				exists = scope:target
+				scope:actor = {
+					has_claim_on = scope:target
+				}
+			}
+			custom_description = {
+				text = buy_claim_has_pressed_claim_already
+				always = no
+			}
+		}
+		trigger_if = { # Can't request claims on baronies
+			limit = {
+				exists = scope:target
+				scope:target = {
+					tier = tier_barony
+				}
+			}
+			custom_description = {
+				text = "hof_ask_for_claim_no_baronies"
+				always = no
+			}
+		}
+		trigger_if = { # Can't buy Kingdom Claims if you're a King or Emperor
+			limit = {
+				exists = scope:target
+				scope:target = {
+					tier = tier_kingdom
+				}
+				scope:actor.highest_held_title_tier >= tier_kingdom
+			}
+			custom_description = {
+				text = buy_claim_no_king_or_emperor_kingdom
+				always = no
+			}
+		}
+		trigger_if = { # Can't buy Emperor Claims if you're already an Emperor
+			limit = {
+				exists = scope:target
+				scope:target = {
+					tier = tier_empire
+				}
+				scope:actor.highest_held_title_tier >= tier_empire
+			}
+			custom_description = {
+				text = buy_claim_no_emperor_empire
+				always = no
+			}
+		}
+		trigger_if = { # Can't buy claims on head of faith titles
+			limit = {
+				scope:target = {is_head_of_faith = yes}
+			}
+			custom_description = {
+				text = buy_claim_no_religious_titles
+				always = no
+			}
+		}
+		scope:recipient = { is_busy_in_events_localised = yes }
+		scope:recipient = { NOT = { has_strong_hook = scope:actor } }
+	}
+	
+	cost = {
+		prestige = {
+			value = {
+				add = minor_prestige_value
+				if = {
+					limit = { scope:target = { tier = tier_county } }
+					multiply = 2
+				}
+				if = {
+					limit = { scope:target = { tier = tier_duchy } }
+					multiply = 4
+				}
+				if = {
+					limit = { scope:target = { tier = tier_kingdom } }
+					multiply = 8
+				}
+				
+				multiply = arcana_claim_cost_modifier
+			}
+		}
+	}
+	
+	auto_accept = yes
+	
+	on_accept = {
+		scope:actor = {
+			send_interface_toast = {
+				title = buy_claim_interaction.message
+				left_icon = scope:actor
+				right_icon = scope:recipient
+
+				add_unpressed_claim = scope:target
+			}
+		}
+		scope:recipient = {
+			add_opinion = {
+				target = scope:actor
+				modifier = claimed_my_title_opinion
+				opinion = -40
+			}
+			# trigger_event = perk_interaction.0002
+		}
+	}
+	ai_potential = {
+		always = yes
+	}
+	
+	ai_targets = {
+		ai_recipients = neighboring_rulers
+	}
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	
+	ai_frequency = 60
+
+	ai_will_do = {
+		base = -20
+		
+		# Factor for personality (excluding realism).
+		modifier = {
+			add = {
+				value = ai_boldness
+				multiply = 1
+			}
+		}
+		modifier = { add = ai_vengefulness }
+		modifier = {
+			add = {
+				value = ai_energy
+				multiply = -0.25
+			}
+		}
+		# Don't challenge kinslayer-counting family, unless they're your nemesis.
+		modifier = {
+			scope:actor = {
+				murdering_character_is_kinslaying_in_faith_trigger = {
+					CHARACTER = scope:recipient
+					FAITH = scope:actor.faith
+				}
+			}
+			scope:recipient = {
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge your spouse, unless they're your nemesis.
+		modifier = {
+			scope:recipient = {
+				is_spouse_of = scope:actor
+				NOT = { has_relation_nemesis = scope:actor }
+			}
+			add = -1000
+		}
+		# Don't challenge people hopelessly out of your league unless you're really, really not seeing things clearly.
+		modifier = {
+			scope:actor = {
+				has_arcana = { VALUE <= 15 }				
+				ai_rationality >= high_negative_ai_value
+			}			
+			add = -1000
+		}
+	}
+}
+
+# Consume prisoner to tsaesce
+consume_interaction = {
+	interface_priority = 200
+	category = interaction_category_prison
+	icon = icon_hostile
+	cooldown = { months = 18 }
+
+
+	desc = consume_interaction_desc
+	# AI
+	ai_targets = {
+		ai_recipients = prisoners
+	}
+	ai_frequency = 120
+
+	ai_potential = {
+		always = yes
+	}
+	
+	ai_will_do = {
+		base = 100
+	}
+	is_shown = {
+		scope:actor = { # the actor needs to have the relevant Tenet AND know the Tsaesci incantations
+			faith = { has_doctrine_parameter = tsaescence_interaction_active }
+		} 
+		scope:recipient = {
+			is_imprisoned_by = scope:actor
+		}
+	}
+
+	is_highlighted = {
+		always = yes
+	}
+
+	is_valid_showing_failures_only = {
+		scope:recipient = { is_busy_in_events_localised = yes } #Prisoner
+		scope:recipient = { NOT = { has_strong_hook = scope:actor } }
+		scope:recipient = {
+			custom_description = {
+				text = "currently_being_tortured"
+				NOT = { has_character_flag = is_being_tortured }
+			}
+		}
+		scope:actor = { knows_language = language_tsaesci } 
+	}
+
+
+	on_accept = {
+		scope:actor = {
+			save_scope_as = imprisoner
+
+			consume_effect = {
+				VICTIM = scope:recipient
+				EXECUTIONER = scope:actor
+			}
+
+			#Event for outcome
+			if = { 
+				limit = {
+					scope:consume_outcome = flag:no_increase
+				}
+				trigger_event = {
+					id = ek_religious_interactions.0200
+				} 
+			}
+			else ={
+				trigger_event = {
+					id = ek_religious_interactions.0201
+				}
+			}
+		}
+
+
+		scope:recipient = {
+			death = {
+					death_reason = death_consumed
+					killer = scope:imprisoner
+			}
+		}
+	}
+
+	auto_accept = yes
+}
+
+thralldom_interaction = {
+	interface_priority = 1000
+	category = interaction_category_prison
+	icon = icon_thralldom
+
+	desc = thralldom_interaction_desc
+	
+	is_shown = {
+		scope:actor = { has_character_flag = new_master } 
+		scope:recipient = {
+			is_imprisoned_by = scope:actor
+			has_character_modifier = modifier_spell_claim_corpse
+		}
+	}
+
+	is_highlighted = {
+		always = yes
+	}
+
+	is_valid_showing_failures_only = {
+		scope:recipient = { is_busy_in_events_localised = yes } #Prisoner
+		scope:recipient = { NOT = { has_strong_hook = scope:actor } }
+		scope:recipient = {
+			custom_description = {
+				text = "currently_being_tortured"
+				NOT = { has_character_flag = is_being_tortured }
+			}
+		}
+	}
+
+	on_accept = {
+		custom_tooltip = get_undead_thrall
+		scope:actor = { save_scope_as = imprisoner}
+		scope:recipient = {
+			death = {
+				death_reason = death_execution_thralldom
+				killer = scope:imprisoner
+			}
+			hidden_effect = { prisoner_thralldom_effect = yes }
+			execute_prisoner_effect = {
+				VICTIM = scope:recipient
+				EXECUTIONER = scope:actor
+			}
+		}
+	}
+
+	auto_accept = yes
+}
+
+thralldom_ai_interaction = {
+	interface_priority = 1000
+	category = interaction_category_prison
+	icon = icon_dead
+
+	desc = thralldom_interaction_desc
+	# AI
+	ai_targets = {
+		ai_recipients = prisoners
+	}
+	ai_frequency = 80
+
+	ai_potential = {
+		always = yes
+	}
+	
+	ai_will_do = {
+		base = 100
+	}
+	is_shown = {
+		scope:actor = {
+			is_ai = yes
+			is_necromancer = yes
+			has_perk = necromancy_journeyman_perk 
+			has_magicka >= { VALUE = claim_corpse_cost }
+		}
+		scope:recipient = {
+			is_imprisoned_by = scope:actor
+			prowess >= 12
+			potential_undead_thrall = yes
+		}
+	}	
+
+	is_highlighted = {
+		always = yes
+	}
+
+	is_valid_showing_failures_only = {
+		scope:recipient = { is_busy_in_events_localised = yes } #Prisoner
+		scope:recipient = { NOT = { has_strong_hook = scope:actor } }
+		scope:recipient = {
+			custom_description = {
+				text = "currently_being_tortured"
+				NOT = { has_character_flag = is_being_tortured }
+			}
+		}
+	}
+
+	on_accept = {
+		custom_tooltip = get_undead_thrall
+		scope:actor = {
+			save_scope_as = imprisoner
+			add_magicka = { VALUE = claim_corpse_cost.negate }
+		}
+			scope:recipient = {
+			death = {
+					death_reason = death_execution_thralldom
+					killer = scope:imprisoner
+			}
+			hidden_effect = { prisoner_thralldom_effect = yes }
+		}
+	}
+
+	auto_accept = yes
+}
+
+disrupt_arcana_interaction = {
+	interface_priority = 30
+
+	category = interaction_category_prison
+
+	desc = disrupt_arcana_interaction_desc
+
+	is_shown = {
+		scope:recipient = {
+			is_imprisoned_by = scope:actor
+			NOT = { has_trait = disrupted }
+		}
+		scope:actor = {
+			is_adult = yes
+			culture = { has_cultural_parameter = can_disrupt_prisoners }
+		}
+	}
+
+	is_valid_showing_failures_only = {
+		scope:recipient = {
+			NOR = {
+				custom_description = {
+					text = "currently_being_tortured"
+					has_character_flag = is_being_tortured
+				}
+			}
+		}
+	}
+
+	is_highlighted = {
+		OR = {
+			scope:actor = { has_trait = sadistic }
+			scope:actor = { has_relation_rival = scope:recipient }
+			scope:recipient = {
+				any_claim = {
+					holder = scope:actor
+				}
+			}
+			scope:actor = {
+				culture = { has_cultural_parameter = can_disrupt_prisoners }
+				OR = {
+					has_execute_reason = scope:recipient
+					has_banish_reason = scope:recipient
+				}
+			}
+		}
+	}
+
+	on_accept = {
+		scope:recipient = {
+			add_character_flag = {
+				flag = is_being_tortured
+				months = 6 # Players in MP can keep the event window open...
+			}
+		}
+
+		blind_and_castrate_actor_effect = yes #Stress & dread
+
+		show_as_tooltip = {
+			scope:recipient = {
+				add_trait = disrupted
+				release_from_prison = yes
+			}
+		}
+
+		# Attuned to Magicka
+		scope:actor = {
+			if = {
+				limit = {
+					culture = { has_cultural_parameter = can_disrupt_prisoners }
+					OR = {
+						has_execute_reason = scope:recipient
+						has_banish_reason = scope:recipient
+					}
+				}
+				add_piety = medium_piety_gain
+			}
+		}
+		
+		torture_blind_castrate_opinion_effect = { VERB = disrupted }
+
+		scope:actor = {
+			trigger_event = {
+				id = ek_prison.1006
+				days = 1
+			}
+		}
+	}
+
+	auto_accept = yes
+
+	ai_targets = {
+		ai_recipients = prisoners
+	}
+
+	ai_potential = {
+		always = yes
+	}
+
+	ai_will_do = {
+		base = -20
+
+		modifier = {
+			has_trait = sadistic
+			add = 20
+		}
+		ai_value_modifier = {
+			ai_compassion = tiny_chance_impact_negative_ai_value #Adds +50 for highly uncompassionate characters, -50 for highly compassionate characters
+		}
+		opinion_modifier = {
+			opinion_target = scope:recipient
+			multiplier = -0.25
+		}
+		modifier = { # Family Feud
+			exists = scope:actor.house
+			exists = scope:recipient.house
+			scope:actor = {
+				house.house_head = {
+					any_owned_story = {
+						story_type = story_cycle_house_feud
+						has_variable = house_feud_house
+						var:house_feud_house = scope:recipient.house
+					}
+				}
+				has_opinion_modifier = {
+					modifier = house_feud_opinion
+					target = scope:recipient.house.house_head
+				}
+			}
+			add = 30
+		}
+	}
+
+	ai_frequency = 36
+}
