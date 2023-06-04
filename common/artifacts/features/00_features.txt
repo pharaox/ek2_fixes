@@ -3352,21 +3352,21 @@
 		}
 		weight = 4
 	}
-	animal_hide_type_lynx = {
-		group = animal_hide_type
-		trigger = {
-			trigger_if = {
-				limit = { exists = scope:owner.var:animal_hide_type }
-				scope:owner.var:animal_hide_type = flag:lynx
-			}
-			trigger_if = {
-				limit = { exists = scope:animal_hide_size }
-				scope:animal_hide_size = flag:medium
-			}
-			artifact_feature_animal_lynx_trigger = yes
-		}
-		weight = 4
-	}
+	#animal_hide_type_lynx = {
+	#	group = animal_hide_type
+	#	trigger = {
+	#		trigger_if = {
+	#			limit = { exists = scope:owner.var:animal_hide_type }
+	#			scope:owner.var:animal_hide_type = flag:lynx
+	#		}
+	#		trigger_if = {
+	#			limit = { exists = scope:animal_hide_size }
+	#			scope:animal_hide_size = flag:medium
+	#		}
+	#		artifact_feature_animal_lynx_trigger = yes
+	#	}
+	#	weight = 4
+	#}
 	#animal_hide_type_lion = {
 	#	group = animal_hide_type
 	#	trigger = {

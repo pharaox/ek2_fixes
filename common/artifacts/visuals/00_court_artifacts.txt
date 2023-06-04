@@ -452,14 +452,14 @@ medium_animal_hide = {
 		}
 		reference = ep1_generic_animal_hide_medium_01_c_entity
 	}
-	asset = {	#spotted
-		trigger = {
-			scope:artifact = {
-				has_artifact_feature = animal_hide_type_lynx
-			}
-		}
-		reference = ep1_generic_animal_hide_medium_02_b_entity
-	}
+	#asset = {	#spotted
+	#	trigger = {
+	#		scope:artifact = {
+	#			has_artifact_feature = animal_hide_type_lynx
+	#		}
+	#	}
+	#	reference = ep1_generic_animal_hide_medium_02_b_entity
+	#}
 	asset = {	#mudcrab
 		trigger = {
 			scope:artifact = {

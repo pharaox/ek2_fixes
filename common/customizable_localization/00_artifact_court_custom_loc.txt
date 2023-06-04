@@ -2070,10 +2070,10 @@ ArtifactAnimalType = {
 		localization_key = animal_type_dragon
 	}
 
-	text = {
-		trigger = { has_artifact_feature = animal_hide_type_lynx }
-		localization_key = animal_type_lynx
-	}
+	#text = {
+	#	trigger = { has_artifact_feature = animal_hide_type_lynx }
+	#	localization_key = animal_type_lynx
+	#}
 }
 
 ArtifactAnimalAdjective = {
