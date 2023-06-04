@@ -288,33 +288,33 @@ ai_cultural_hybridization_interaction = {
 			}
 		}
 		
-		modifier = { # The AI does not want to create a hybrid with a hybrid culture (unless a historical hybrid)
-			factor = 0
-			has_game_rule = relaxed_hybrid_culture_ai_restrictions
-			scope:target = {
-				is_hybrid_culture = yes
-				culture_is_not_historical_hybrid_trigger = yes
-			}
-			scope:actor.culture = {
-				is_hybrid_culture = yes
-				culture_is_not_historical_hybrid_trigger = yes
-			}
-		}
+		#modifier = { # The AI does not want to create a hybrid with a hybrid culture (unless a historical hybrid)
+		#	factor = 0
+		#	has_game_rule = relaxed_hybrid_culture_ai_restrictions
+		#	scope:target = {
+		#		is_hybrid_culture = yes
+		#		culture_is_not_historical_hybrid_trigger = yes
+		#	}
+		#	scope:actor.culture = {
+		#		is_hybrid_culture = yes
+		#		culture_is_not_historical_hybrid_trigger = yes
+		#	}
+		#}
 		
-		modifier = { # The AI does not want to create a hybrid with a hybrid culture or if the target is a hybrid (unless a historical hybrid)
-			factor = 0
-			has_game_rule = default_hybrid_culture_ai_restrictions
-			OR = {
-				scope:target = {
-					is_hybrid_culture = yes
-					culture_is_not_historical_hybrid_trigger = yes
-				}
-				scope:actor.culture = {
-					is_hybrid_culture = yes
-					culture_is_not_historical_hybrid_trigger = yes
-				}
-			}
-		}
+		#modifier = { # The AI does not want to create a hybrid with a hybrid culture or if the target is a hybrid (unless a historical hybrid)
+		#	factor = 0
+		#	has_game_rule = default_hybrid_culture_ai_restrictions
+		#	OR = {
+		#		scope:target = {
+		#			is_hybrid_culture = yes
+		#			culture_is_not_historical_hybrid_trigger = yes
+		#		}
+		#		scope:actor.culture = {
+		#			is_hybrid_culture = yes
+		#			culture_is_not_historical_hybrid_trigger = yes
+		#		}
+		#	}
+		#}
 		
 		modifier = { # The AI does not want to create a hybrid with a hybrid culture that their culture is a parent of, or share heritage of
 			factor = 0
