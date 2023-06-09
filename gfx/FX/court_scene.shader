@@ -2477,7 +2477,7 @@ Effect portrait_attachment_glass
 	PixelShader = "PS_attachment"
 	BlendState = "hair_alpha_blend"
 	#DepthStencilState = "hair_alpha_blend"
-	Defines = { "USE_CHARACTER_DATA" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "PDX_MESH_BLENDSHAPES" "REFRACT"}
+	Defines = { "USE_CHARACTER_DATA" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "PDX_MESH_BLENDSHAPES" "PARALLAX" "REFRACT"}
 }
 
 Effect portrait_attachment_glass_selection
@@ -2493,7 +2493,7 @@ Effect portrait_attachment_pattern_glass
 	PixelShader = "PS_attachment"
 	BlendState = "hair_alpha_blend"
 	#DepthStencilState = "hair_alpha_blend"
-	Defines = { "VARIATIONS_ENABLED" "USE_CHARACTER_DATA" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "PDX_MESH_BLENDSHAPES" "REFRACT"}
+	Defines = { "VARIATIONS_ENABLED" "USE_CHARACTER_DATA" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "PDX_MESH_BLENDSHAPES" "PARALLAX" "REFRACT"}
 }
 
 Effect portrait_attachment_pattern_glass_selection

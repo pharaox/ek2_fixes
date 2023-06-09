@@ -1486,7 +1486,7 @@ Effect portrait_attachment_glass
     PixelShader = "PS_attachment"
     BlendState = "alpha_to_coverage"
     #DepthStencilState = "hair_alpha_blend"
-    Defines = { "PDX_MESH_BLENDSHAPES" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "REFRACT" }
+    Defines = { "PDX_MESH_BLENDSHAPES" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "PARALLAX" "REFRACT"}
 }
 
 Effect portrait_attachment_pattern_glass
@@ -1495,7 +1495,7 @@ Effect portrait_attachment_pattern_glass
     PixelShader = "PS_attachment"
     BlendState = "alpha_to_coverage"
     #DepthStencilState = "hair_alpha_blend"
-    Defines = {"PDX_MESH_BLENDSHAPES" "VARIATIONS_ENABLED" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "REFRACT"}
+    Defines = {"PDX_MESH_BLENDSHAPES" "VARIATIONS_ENABLED" "EMISSIVE_NORMAL_BLUE" "ATTACHEMENT_DECAY" "PARALLAX" "REFRACT"}
 }
 
 Effect skybox_attachment
