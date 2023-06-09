@@ -264,7 +264,7 @@ mages = {
 	parent = men_at_arms
 }
 spellblades = {
-	texture = "gfx/interface/icons/regimenttypes/spellswords.dds"
+	texture = "gfx/interface/icons/regimenttypes/spellblades.dds"
 	parent = men_at_arms
 }
 
