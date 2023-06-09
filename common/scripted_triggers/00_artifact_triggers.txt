@@ -331,6 +331,7 @@ artifact_use_mediterranean_building_visuals_trigger = {
 		OR = {
 			has_building_gfx = ek_colovian_building_gfx
 			has_building_gfx = ek_cyrodilic_building_gfx
+			has_building_gfx = ek_heartlander_building_gfx
 		}
 	}
 }
@@ -341,6 +342,7 @@ artifact_use_iberian_building_visuals_trigger = {
 		OR = {
 			has_building_gfx = ek_yokudan_building_gfx
 			has_building_gfx = ek_redguard_building_gfx
+			has_building_gfx = ek_strident_building_gfx
 		}
 	}
 }
