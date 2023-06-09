@@ -1,0 +1,1443 @@
+﻿choose_patron_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+
+	desc = choose_patron_decision_desc
+	selection_tooltip = choose_patron_decision_tooltip
+
+	is_shown = {
+		is_ai = yes
+		NOT = { has_character_flag = ek_has_patron }
+	}
+
+	effect = {
+		trigger_event = religious_decision.0101
+	}
+	ai_potential = { always = yes }
+	ai_will_do = { base = 100 }
+	
+	ai_goal = yes
+}
+
+### Change what kind of holy site you can build in a province
+change_holy_site_type_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+
+	desc = change_holy_site_type_decision_desc
+	selection_tooltip = change_holy_site_type_decision_tooltip
+
+	is_shown = {
+		is_ruler = yes
+		# One of the holy sites of your faith that you control has a holy site building that you can't use
+		faith = {
+			any_dynamic_holy_site = {
+				holder = root
+				title_province = {
+					province_has_wrong_holy_building_slot = { CHAR = root PROVINCE = this }
+				}
+			}
+		}
+	}
+	
+	cost = {
+		gold = 250
+		piety = 150
+	}
+
+	effect = {
+		# Pay some gold, destroy the holy site building (if needed), lay ground for one of your own
+		faith = {
+			random_dynamic_holy_site = {
+				limit = {
+					holder = root
+					title_province = {
+						province_has_wrong_holy_building_slot = { CHAR = root PROVINCE = this }
+					}
+				}
+				# Remove the holy building
+				title_province = {
+					if = {
+						limit = { has_building = grand_cathedral_01 }
+						remove_building = grand_cathedral_01
+						remove_variable = grand_cathedral
+					}
+					else_if = {
+						limit = { has_building = daedric_shrine_01 }
+						remove_building = daedric_shrine_01
+						remove_variable = daedric_shrine
+					}
+					else_if = {
+						limit = { has_building = great_wyrd_tree_01 }
+						remove_building = great_wyrd_tree_01
+						remove_variable = great_wyrd_tree
+					}
+					else_if = {
+						limit = { has_building = dragon_temple_01 }
+						remove_building = dragon_temple_01
+						remove_variable = dragon_temple
+					}
+					else_if = {
+						limit = { has_building = holy_site_other_grand_temple_01 }
+						remove_building = holy_site_other_grand_temple_01
+						remove_variable = holy_site_other_grand_temple
+					}
+				
+					# We add the holy building slot!
+					# Note: We have to first create the new holy building and then remove it immediately
+					# The "add_special_building_slot" is just for show, it doesn't do anything
+					if = {
+						limit = { root.faith = { has_doctrine_parameter = faith_uses_grand_cathedral } }
+						hidden_effect = { add_special_building = grand_cathedral_01 remove_building = grand_cathedral_01 set_variable = { name = grand_cathedral value = yes } }
+						show_as_tooltip = { add_special_building_slot = grand_cathedral_01 }
+					}
+					else_if = {
+						limit = { root.faith = { has_doctrine_parameter = faith_uses_daedric_shrine } }
+						hidden_effect = { add_special_building = daedric_shrine_01 remove_building = daedric_shrine_01 set_variable = { name = daedric_shrine value = yes } }
+						show_as_tooltip = { add_special_building_slot = daedric_shrine_01 }
+					}
+					else_if = {
+						limit = { root.faith = { has_doctrine_parameter = faith_uses_great_wyrd_tree } }
+						hidden_effect = { add_special_building = great_wyrd_tree_01 remove_building = great_wyrd_tree_01 set_variable = { name = great_wyrd_tree value = yes } }
+						show_as_tooltip = { add_special_building_slot = great_wyrd_tree_01 }
+					}
+					else_if = {
+						limit = { root.faith = { has_doctrine_parameter = faith_uses_dragon_temple } }
+						hidden_effect = { add_special_building = dragon_temple_01 remove_building = dragon_temple_01 set_variable = { name = dragon_temple value = yes } }
+						show_as_tooltip = { add_special_building_slot = dragon_temple_01 }
+					}
+					else_if = {
+						limit = { root.faith = { has_doctrine_parameter = faith_uses_holy_site_other_grand_temple } }
+						hidden_effect = { add_special_building = holy_site_other_grand_temple_01 remove_building = holy_site_other_grand_temple_01 set_variable = { name = holy_site_other_grand_temple value = yes } }
+						show_as_tooltip = { add_special_building_slot = holy_site_other_grand_temple_01 }
+					}
+				}
+			}
+		}
+	}
+	
+	ai_check_interval = 120
+}
+
+### Custom holy sites
+# Consecrate a new holy site in your capital
+consecrate_new_holy_site_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	major = yes
+
+	desc = consecrate_new_holy_site_decision_desc
+	selection_tooltip = consecrate_new_holy_site_decision_tooltip
+	
+	is_shown = {
+		is_ai = no
+		
+		faith = {
+			OR = {
+				# If your faith doesn't have any holy site then your capital can't be one, obviously
+				NOT = { has_variable_list = holy_sites }
+				
+				# Your capital isn't already a holy site
+				NOT = {
+					any_in_list = {
+						variable = holy_sites
+						
+						exists = var:holy_site_county
+						var:holy_site_county = root.capital_county
+					}
+				}
+			}
+		}
+		# No county within your capital duchy is already a holy site of your faith
+		NOT = {
+			capital_county.duchy = {
+				any_in_de_jure_hierarchy = {
+					tier = tier_county
+					save_temporary_scope_as = current_county
+					root.faith = {
+						is_target_in_variable_list = {
+							name = holy_sites
+							target = scope:current_county
+						}
+					}
+				}
+			}
+		}
+		# OR = {
+			# # Your capital doesn't have a special building already
+			# NOT = { capital_province = { has_special_building_slot = yes } }
+			# # The special building is a holy site building that your faith can use
+			# trigger_if = {
+				# limit = { faith = { has_doctrine_parameter = faith_uses_grand_cathedral } }
+				# capital_province = {
+					# has_variable = grand_cathedral
+				# }
+			# }
+			# trigger_else_if = {
+				# limit = { faith = { has_doctrine_parameter = faith_uses_dragon_temple } }
+				# capital_province = {
+					# has_variable = dragon_temple
+				# }
+			# }
+			# trigger_else_if = {
+				# limit = { faith = { has_doctrine_parameter = faith_uses_daedric_shrine } }
+				# capital_province = {
+					# has_variable = daedric_shrine
+				# }
+			# }
+			# trigger_else_if = {
+				# limit = { faith = { has_doctrine_parameter = faith_uses_great_wyrd_tree } }
+				# capital_province = {
+					# has_variable = great_wyrd_tree
+				# }
+			# }
+		# }
+	}
+	
+	is_valid = {
+		AND = {
+			capital_county = {
+				# Your capital is of your faith (duh)
+				custom_description = {
+					text = capital_shares_faith
+					faith = root.faith
+				}
+				
+				# If your faith has the Communal or Cultural Identity, then your capital must be of your culture
+				trigger_if = {
+					limit = { faith = { has_doctrine_parameter = establishing_holy_site_same_heritage_active } }
+					custom_description = {
+						text = capital_shares_heritage
+						culture = { has_same_culture_heritage = root.culture }
+					}
+				}
+				trigger_else_if = {
+					limit = { faith = { has_doctrine_parameter = establishing_holy_site_same_culture_active } }
+					custom_description = {
+						text = capital_shares_culture
+						culture = root.culture
+					}
+				}
+				trigger_else = {}
+				
+				# Your capital has a Temple barony
+				custom_description = {
+					text = county_must_have_temple_holding
+					any_county_province = { has_holding_type = church_holding }
+				}
+			}
+			
+			### 0 HS: very easy to create one
+			# 1-3 HS: fairly easy to create one
+			# 4-6 HS: moderately difficult to create one
+			# 7-9 HS: quite difficult to create one
+			# If we have a religious head, they need to like us. Otherwise, it is overall a bit more difficult to create a new holy site
+			trigger_if = {
+				limit = { NOT = { faith = { has_variable_list = holy_sites } } }
+				trigger_if = {
+					limit = { exists = faith.religious_head }
+					piety_level >= 1
+					faith.religious_head = { opinion = { target = root value > 0 } }
+				}
+				trigger_else = {
+					piety_level >= 2
+				}
+			}
+			trigger_else_if = {
+				limit = { faith = { variable_list_size = { name = holy_sites value < 4 } } }
+				trigger_if = {
+					limit = { exists = faith.religious_head }
+					piety_level >= 2
+					faith.religious_head = { opinion = { target = root value > 20 } }
+				}
+				trigger_else = {
+					piety_level >= 3
+				}
+			}
+			trigger_else_if = {
+				limit = { faith = { variable_list_size = { name = holy_sites value < 7 } } }
+				trigger_if = {
+					limit = { exists = faith.religious_head }
+					piety_level >= 3
+					faith.religious_head = { opinion = { target = root value > 40 } }
+				}
+				trigger_else = {
+					piety_level >= 4
+				}
+			}
+			trigger_else = {
+				trigger_if = {
+					limit = { exists = faith.religious_head }
+					piety_level >= 4
+					faith.religious_head = { opinion = { target = root value > 60 } }
+				}
+				trigger_else = {
+					piety_level >= 5
+				}
+			}
+		}
+	}
+	
+	cost = {
+		gold = consecrate_new_holy_site_decision_gold_cost
+		piety = consecrate_new_holy_site_decision_piety_cost
+	}
+	
+	effect = {
+		custom_tooltip = consecrate_new_holy_site_decision_effect_1
+		custom_tooltip = consecrate_new_holy_site_decision_effect_2
+		
+		# We create the new holy site
+		show_as_tooltip = { create_new_holy_site = { FAITH = root.faith COUNTY = root.capital_county SPECIAL_EFFECT = flag:none } }
+		
+		# Some more information about holy site creation
+		if = {
+			limit = { NOT = { capital_province = { has_special_building_slot = yes } } }
+			custom_tooltip = consecrate_new_holy_site_decision_effect_3_a
+		}
+		else = {
+			custom_tooltip = consecrate_new_holy_site_decision_effect_3_b
+		}
+		
+		trigger_event = ek_religious_decision.2001
+	}
+	
+	ai_check_interval = 120
+
+	ai_will_do = {
+		base = 20
+		
+		modifier = {
+			add = 30
+			has_trait = zealous
+		}
+		modifier = {
+			add = -20
+			has_trait = cynical
+		}
+	}
+}
+
+### Vows of Squalor
+take_vow_of_squalor_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+
+	desc = take_vow_of_squalor_decision_desc
+	selection_tooltip = take_vow_of_squalor_decision_tooltip
+
+	is_shown = {
+		is_ruler = yes
+		faith = { has_doctrine_parameter = vows_of_squalor_active }
+		NOT = { has_character_modifier = vow_of_squalor_modifier }
+	}
+
+	effect = {
+		add_character_modifier = {
+			modifier = vow_of_squalor_modifier
+		}
+
+		stress_impact = {
+			greedy = major_stress_impact_gain
+			cynical = medium_stress_impact_gain
+			ambitious = minor_stress_impact_gain
+		}
+	}
+	
+	ai_check_interval = 120
+
+	ai_potential = {
+	}
+
+	ai_will_do = {
+		base = 0
+	}
+}
+
+renounce_vow_of_squalor_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+
+	desc = renounce_vow_of_squalor_decision_desc
+	selection_tooltip = renounce_vow_of_squalor_decision_tooltip
+
+	is_shown = {
+		is_ruler = yes
+		faith = { has_doctrine_parameter = vows_of_squalor_active }
+		has_character_modifier = vow_of_squalor_modifier
+	}
+
+	effect = {
+		add_piety = medium_piety_loss
+		remove_character_modifier = vow_of_squalor_modifier
+
+		stress_impact = {
+			generous = major_stress_impact_gain
+			zealous = medium_stress_impact_gain
+			humble = minor_stress_impact_gain
+		}
+	}
+	
+	ai_check_interval = 60
+
+	ai_potential = {
+	}
+
+	ai_will_do = {
+		base = 0
+	}
+}
+
+### Rite of Passage
+rite_of_passage_decision = {
+	title = {
+		first_valid = {
+			triggered_desc = {
+				trigger = { religion = religion:aldmeri_religion }
+				desc = rite_of_passage_decision_athel_vialen_name
+			}
+			desc = rite_of_passage_decision_fallback_name
+		}
+	}
+	picture = "gfx/interface/illustrations/decisions/fp1_decisons_hold_bolt.dds"
+	desc = rite_of_passage_decision_desc
+	selection_tooltip = rite_of_passage_decision_tooltip
+	major = yes
+
+	is_shown = {
+		# Cut for the initial release, we'll see to it once we have more time
+		always = no
+		# faith = { has_doctrine_parameter = rite_of_passage_decision_active }
+	}
+
+	is_valid = {
+		is_ai = no
+	}
+
+	effect = {
+		custom_tooltip = rite_of_passage_decision_tt
+		custom_tooltip = rite_of_passage_decision_religion_specific_tt
+		
+		### Religion & tenet specific
+		if = {
+			limit = { faith = { has_doctrine_parameter = cannibalism_legal } }
+			custom_tooltip = rite_of_passage_decision_cannibalism_legal_tt
+		}
+		
+		if = {
+			limit = { faith = { has_doctrine = doctrine_lycanthropy_accepted } }
+			custom_tooltip = rite_of_passage_decision_lycanthropy_legal_tt
+		}
+		
+		if = {
+			limit = { faith = { has_doctrine = doctrine_lycanthropy_outlawed } }
+			custom_tooltip = rite_of_passage_decision_lycanthropy_outlawed_tt
+		}
+		
+		if = {
+			limit = { faith = { has_doctrine = doctrine_vampirism_accepted } }
+			custom_tooltip = rite_of_passage_decision_vampirism_legal_tt
+		}
+		
+		if = {
+			limit = { faith = { has_doctrine = doctrine_vampirism_outlawed } }
+			custom_tooltip = rite_of_passage_decision_vampirism_outlawed_tt
+		}
+		
+		trigger_event = ek_religious_decision.0001
+	}
+
+	cost = { prestige = 50 }
+
+	ai_check_interval = 60
+	
+	ai_potential = {
+	}
+
+	ai_will_do = {
+		base = 100
+	}
+}
+
+### Skaal sacred rituals
+# Ristaag - Ritual hunt to bless & cleanse the land, and hopefully please the All-Maker
+# Small event chain with how to deal with the hunt, before finding the Spirit Bear
+start_ristaag_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 60
+
+	desc = start_ristaag_decision_desc
+	selection_tooltip = start_ristaag_decision_tooltip
+	
+	cooldown = { years = pilgrimage_cooldown_year_amount }
+
+	is_shown = {
+		is_ruler = yes
+		faith = { has_doctrine_parameter = allows_ristaag_decision_active }
+	}
+	
+	is_valid_showing_failures_only = {
+		is_available_adult = yes
+		is_landed = yes
+	}
+
+	effect = {
+		custom_tooltip = start_ristaag_decision_effect_tooltip
+		
+		trigger_event = ek_religious_decision.0101
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+		
+		### EK TODO: Make it scale based on the average (if possible?) county opinion and control
+	}
+}
+
+### Summon Dragons
+# When at war, can spend a heavy piety cost to summon Dragons, very powerful non-regenerating troops. They bail once the war is over.
+summon_dragons_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 12
+	
+	major = yes
+
+	desc = summon_dragons_decision_desc
+	selection_tooltip = summon_dragons_decision_tooltip
+	
+	cooldown = { months = 12 }
+
+	is_shown = {
+		is_ruler = yes
+		faith = { has_doctrine_parameter = can_use_summon_dragons_active }
+	}
+	
+	is_valid = {
+		is_at_war = yes
+	}
+	
+	cost = {
+		piety = summon_dragons_cost
+	}
+
+	effect = {
+		custom_tooltip = summon_dragons_decision_effect_tooltip
+		custom_tooltip = summon_dragons_decision_effect_tooltip_2
+		
+		trigger_event = ek_religious_decision.0301
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+	}
+}
+
+### Call for Nightmares
+# Invoke your god (mostly Vaermina) to send you a nightmare. Heavy stress hit if you fail, piety gain if you win
+call_for_nightmares_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 12
+
+	desc = call_for_nightmares_decision_desc
+	selection_tooltip = call_for_nightmares_decision_tooltip
+	
+	# cooldown = { months = 60 }
+
+	is_shown = {
+		is_ruler = yes
+		faith = { has_doctrine_parameter = intentional_nightmares_mechanics_active }
+	}
+	
+	is_valid = {
+		# Doesn't already have a nightmare modifier
+		NOT = {
+			has_character_modifier = ritual_nightmares_triumph_1_modifier
+			has_character_modifier = ritual_nightmares_defeat_1_modifier
+		}
+	}
+	
+	is_valid_showing_failures_only = {
+		is_available_adult = yes
+	}
+
+	effect = {
+		custom_tooltip = call_for_nightmares_decision_effect_tooltip
+		
+		show_as_tooltip = {
+			random_list = {
+				50 = {
+					show_chance = no
+					desc = call_for_nightmares_decision_effect_tooltip_success
+					add_piety = 250
+				}
+				50 = {
+					show_chance = no
+					desc = call_for_nightmares_decision_effect_tooltip_failure
+					add_stress = medium_stress_impact_gain
+				}
+			}
+		}
+		
+		trigger_event = ek_religious_decision.0601
+		
+		stress_impact = {
+			craven = medium_stress_impact_gain
+			cynical = minor_stress_impact_gain
+		}
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+	}
+}
+
+### Bury an ancestor in Cath Bedraud
+# TODO: Holy Sites features
+bury_in_cath_bedraud_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+
+	desc = bury_in_cath_bedraud_decision_desc
+	selection_tooltip = bury_in_cath_bedraud_decision_tooltip
+
+	is_shown = {
+		# faith = { controls_holy_site_with_flag = is_used_for_cath_bedraud_burial }
+		# root.faith = {
+			# controls_holy_site = hs_cath_bedraud
+		# }
+		
+		dynamic_holy_site_is_controlled = { HOLY_SITE = title:c_cath_bedraud FAITH = root.faith }
+		title:c_cath_bedraud = {
+			is_dynamic_holy_site_of = { FAITH = root.faith }
+		}
+		has_variable = ancestor_to_bury
+	}
+
+	is_valid_showing_failures_only = {
+		is_available_adult = yes
+		is_at_war = no
+	}
+
+	effect = {
+		show_as_tooltip = {
+			dynasty = { add_dynasty_prestige = minor_dynasty_prestige_value }
+			if = {
+				limit = {
+					any_vassal = {
+						save_temporary_scope_as = current_vassal
+						
+						dynamic_holy_site_is_controlled = { HOLY_SITE = title:c_cath_bedraud FAITH = scope:current_vassal.faith }
+						title:c_cath_bedraud = {
+							is_dynamic_holy_site_of = { FAITH = scope:current_vassal.faith }
+						}
+					}
+				}
+				every_vassal = {
+					limit = {
+						save_temporary_scope_as = current_vassal
+						
+						dynamic_holy_site_is_controlled = { HOLY_SITE = title:c_cath_bedraud FAITH = scope:current_vassal.faith }
+						title:c_cath_bedraud = {
+							is_dynamic_holy_site_of = { FAITH = scope:current_vassal.faith }
+						}
+					}
+					custom = give_cath_bedraud_burial_vassals
+					add_opinion = {
+						modifier = pleased_opinion
+						target = root
+						opinion = 20
+					}
+				}
+			}
+		}
+		trigger_event = ek_religious_decision.0502
+	}
+
+	ai_check_interval = 36
+	
+	ai_potential = {
+		always = yes
+	}
+
+	ai_will_do = {
+		base = 100
+	}
+}
+
+##### Monolatric Aspects decisions
+### Aspect of Knowledge
+# Improve the education
+aspect_knowledge_increase_education_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 12
+	
+	major = yes
+
+	desc = aspect_knowledge_increase_education_decision_desc
+	selection_tooltip = aspect_knowledge_increase_education_decision_tooltip
+	
+	cooldown = { months = 120 }
+
+	is_shown = {
+		# is_ruler = yes # Would be nice to have courtiers also improve their education
+		faith = { has_doctrine_parameter = devotion_lvl_4_gives_increase_education }
+		
+		piety_level >= 2
+		
+		OR = {
+			has_education_rank_1_trigger = yes
+			has_education_rank_2_trigger = yes
+			has_education_rank_3_trigger = yes
+		}
+	}
+	
+	is_valid = {
+		piety_level >= 4
+		
+		trigger_if = {
+			limit = { has_education_rank_1_trigger = yes }
+			piety >= 250
+		}
+		trigger_if = {
+			limit = { has_education_rank_2_trigger = yes }
+			piety >= 500
+		}
+		trigger_if = {
+			limit = { has_education_rank_3_trigger = yes }
+			piety >= 750
+		}
+	}
+
+	effect = {
+		show_as_tooltip = {
+			if = {
+				limit = { has_education_rank_1_trigger = yes }
+				add_piety = -250
+			}
+			if = {
+				limit = { has_education_rank_2_trigger = yes }
+				add_piety = -500
+			}
+			if = {
+				limit = { has_education_rank_3_trigger = yes }
+				add_piety = -750
+			}
+			custom_tooltip = aspect_knowledge_increase_education_decision_effect_tt
+			rank_up_education_effect = yes
+		}
+		
+		trigger_event = ek_religious_decision.1001
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+	}
+}
+
+# Swap the education
+aspect_knowledge_swap_education_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 12
+	
+	major = yes
+
+	desc = aspect_knowledge_swap_education_decision_desc
+	selection_tooltip = aspect_knowledge_swap_education_decision_tooltip
+	
+	cooldown = { months = 120 }
+
+	is_shown = {
+		is_ai = no # Not sure yet, might need to be locked to players only
+		is_ruler = yes
+		faith = { has_doctrine_parameter = devotion_lvl_5_gives_change_education }
+		
+		piety_level >= 3
+	}
+	
+	is_valid = {
+		piety_level >= 5
+	}
+	
+	cost = {
+		piety = 1000
+	}
+
+	effect = {
+		custom_tooltip = aspect_knowledge_swap_education_decision_effect_tt
+		trigger_event = ek_religious_decision.1002
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+	}
+}
+
+### Aspect of the Stars
+# Change our Star sign
+aspect_stars_change_starsign_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 12
+	
+	major = yes
+
+	desc = aspect_stars_change_starsign_decision_desc
+	selection_tooltip = aspect_stars_change_starsign_decision_tooltip
+	
+	cooldown = { months = 120 }
+
+	is_shown = {
+		is_ai = no # Not sure yet, might need to be locked to players only
+		is_ruler = yes
+		faith = { has_doctrine_parameter = devotion_lvl_4_gives_changing_star_sign }
+		
+		piety_level >= 2
+	}
+	
+	is_valid = {
+		piety_level >= 4
+	}
+	
+	cost = {
+		piety = 1000
+	}
+
+	effect = {
+		custom_tooltip = aspect_stars_change_starsign_decision_effect_tt
+		trigger_event = ek_religious_decision.1003
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+	}
+}
+
+### Aspect of Inner Peace
+# Remove a negative coping and seething trait
+aspect_inner_peace_remove_bad_stress_trait_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 12
+	
+	major = yes
+
+	desc = aspect_inner_peace_remove_bad_stress_trait_decision_desc
+	selection_tooltip = aspect_inner_peace_remove_bad_stress_trait_decision_tooltip
+	
+	cooldown = { months = 120 }
+
+	is_shown = {
+		is_ruler = yes
+		faith = { has_doctrine_parameter = devotion_lvl_4_gives_lose_coping_trait }
+		
+		piety_level >= 2
+		has_negative_stress_trigger = yes
+	}
+	
+	is_valid = {
+		piety_level >= 4
+		has_negative_stress_trigger = yes
+	}
+	
+	cost = {
+		piety = 250
+	}
+
+	effect = {
+		custom_tooltip = aspect_inner_peace_remove_bad_stress_trait_decision_effect_tt
+		trigger_event = ek_religious_decision.1010
+	}
+
+	ai_potential = {
+		is_landed = yes
+	}
+
+	ai_will_do = {
+		base = 20
+	}
+}
+
+### Hist Faiths
+# Chukka-Sei
+chukka_sei_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_commune_hist.dds"
+	major = yes
+	ai_check_interval = 12
+
+	desc = chukka_sei_decision_desc
+	selection_tooltip = chukka_sei_decision_tooltip
+
+	cooldown = { months = 12 }
+
+	is_shown = {
+		NOT = {
+		has_character_flag = chukka-sei
+		}
+		OR = {
+			has_culture = culture:hleel
+			has_culture = culture:naga
+			has_culture = culture:paatru
+			has_culture = culture:agaceph
+			has_culture = culture:sarpa
+			has_culture = culture:hapsleet
+		}
+	}
+
+	is_valid = {
+		is_adult = yes
+		custom_description = {
+			text = current_month_5
+			current_month = 5
+		}
+	}
+
+	effect = {
+		custom_tooltip = chukka_sei_decision_effect_tt
+		trigger_event = ek_coming_of_age.0010
+	}
+
+	ai_potential = {
+		always = yes
+	}
+}
+
+# Commune with the Hist
+commune_with_hist_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_commune_hist.dds"
+	ai_check_interval = 60
+
+	desc = commune_with_hist_decision_desc
+	selection_tooltip = commune_with_hist_decision_tooltip
+
+	cooldown = { years = pilgrimage_cooldown_year_amount }
+
+	is_shown = {
+		has_character_flag = chukka-sei
+		is_landed = yes
+		faith = { has_doctrine = doctrine_pantheon_hist }
+	}
+
+	effect = {
+		custom_tooltip = commune_with_hist_decision_effect_tt
+		trigger_event = ek_religious_decision.1011
+	}
+
+	ai_potential = {
+		always = yes
+	}
+
+	ai_will_do = {
+		base = 50
+
+		# 100% chance at 50 zeal, 0% chance at -50 zeal.
+		ai_value_modifier = {
+			ai_zeal = 1
+		}		
+	}
+}
+
+# Commune with the Totem Spirit
+commune_with_totem_spirit_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	ai_check_interval = 60
+
+	desc = commune_with_totem_spirit_decision_desc
+	selection_tooltip = commune_with_totem_spirit_decision_tooltip
+
+	cooldown = { years = pilgrimage_cooldown_year_amount }
+
+	is_shown = {
+		is_landed = yes
+		culture = { has_cultural_pillar = heritage_orsimeri }
+		faith = { has_doctrine = doctrine_clerical_gender_female_only }
+	}
+
+	effect = {
+		custom_tooltip = commune_with_totem_spirit_decision_effect_tt
+		trigger_event = {
+			id = ek_religious_decision.1013
+			days = { 5 30 }
+		} 
+	}
+
+	ai_potential = {
+		always = yes
+	}
+
+	ai_will_do = {
+		base = 50
+
+		# 100% chance at 50 zeal, 0% chance at -50 zeal.
+		ai_value_modifier = {
+			ai_zeal = 1
+		}		
+	}
+}
+
+# seek sanguine to make a deal
+sanguine_deal_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_misc.dds"
+	ai_check_interval = 60
+
+	desc = sanguine_deal_decision_desc
+	selection_tooltip = sanguine_deal_decision_tooltip
+
+	cooldown = { years = pilgrimage_cooldown_year_amount }
+
+	is_shown = {
+		is_landed = yes
+		has_character_modifier = sanguines_wrath
+	}
+
+	cost = {
+		gold = {
+			value = medium_gold_value
+		}
+		piety = {
+			value = medium_piety_value
+		}
+		prestige = {
+			value = medium_prestige_value
+		}
+	}
+
+	effect = {
+		custom_tooltip = sanguine_deal_decision_effect_tt
+		trigger_event = {
+			id = ek_religious_decision.1014
+			days = { 5 30 }
+		} 
+	}
+
+	ai_potential = {
+		always = yes
+	}
+
+	ai_will_do = {
+		base = 50
+
+		# 100% chance at 50 zeal, 0% chance at -50 zeal.
+		ai_value_modifier = {
+			ai_zeal = 1
+		}		
+	}
+}
+
+### Liturgical language
+# Recruit a scholar/priest knowing the language
+recruit_priest_liturgical_language_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	major = yes
+
+	ai_check_interval = 120
+
+	cooldown = { years = 1 }
+	
+	desc = {
+		first_valid = {
+			triggered_desc = {
+				trigger = { faith = { has_doctrine_parameter = realm_priest_must_speak_daedric } }
+				desc = recruit_priest_liturgical_language_decision_daedric
+			}
+			triggered_desc = {
+				trigger = { faith = { has_doctrine_parameter = realm_priest_must_speak_dragon } }
+				desc = recruit_priest_liturgical_language_decision_dragon
+			}
+			triggered_desc = {
+				trigger = { faith = { has_doctrine_parameter = realm_priest_must_speak_tsaesci } }
+				desc = recruit_priest_liturgical_language_decision_tsaesci
+			}
+		}
+	}
+
+	is_shown = {
+		faith = {
+			OR = {
+				has_doctrine_parameter = realm_priest_must_speak_daedric
+				has_doctrine_parameter = realm_priest_must_speak_dragon
+				has_doctrine_parameter = realm_priest_must_speak_tsaesci
+			}
+		}
+		
+		# You must lack a realm priest
+		NOT = { exists = cp:councillor_court_chaplain }
+	}
+
+	effect = {
+		custom_tooltip = recruit_priest_liturgical_language_decision.tt
+		hidden_effect = {
+			if = {
+				limit = {
+					exists = root.capital_province
+					any_pool_character = {
+						province = root.capital_province
+						can_be_court_chaplain_trigger = { COURT_OWNER = root }
+						learning >= medium_skill_rating
+						opinion = { # Just to make sure you don't pull in rivals or similar
+							value >= -30
+							target = root
+						}
+					}
+				}
+				random_pool_character = {
+					province = root.capital_province
+					limit = {
+						can_be_court_chaplain_trigger = { COURT_OWNER = root }
+						learning >= medium_skill_rating
+						opinion = { # Just to make sure you don't pull in rivals or similar
+							value >= -30
+							target = root
+						}
+					}
+					
+					save_scope_as = new_priest
+				}
+			}
+			else = {
+				create_character = {
+					employer = root
+					template = priest_character_template
+					faith = root.faith
+					culture = root.culture
+					dynasty = none
+					# gender_female_chance = root_faith_clergy_gender_female_chance
+					
+					save_scope_as = new_priest
+				}
+			}
+			
+			if = { # Error suppression
+				limit = {
+					exists = scope:new_priest
+				}
+				scope:new_priest = {
+					force_character_skill_recalculation = yes
+					add_character_flag = {
+						flag = blocked_from_leaving
+						years = 25
+					}
+				}
+				if = {
+					limit = {
+						scope:new_priest = {
+							NOT = {
+								is_courtier_of = root
+							}
+						}
+					}
+					add_courtier = scope:new_priest
+				}
+				if = {
+					limit = {
+						exists = cp:councillor_court_chaplain
+					}
+					fire_councillor = cp:councillor_court_chaplain
+					assign_councillor_type = {
+						type = councillor_court_chaplain
+						target = scope:new_priest
+					}
+				}
+				else = {
+					assign_councillor_type = {
+						type = councillor_court_chaplain
+						target = scope:new_priest
+					}
+				}
+				send_interface_toast = {
+					title = priest_recruited.t
+					left_icon = scope:new_priest
+					custom_tooltip = priest_recruited.desc
+				}
+			}
+		}
+	}
+
+	cost = {
+		gold = {
+			value = minor_gold_value
+		}
+		piety = {
+			value = medium_piety_value
+		}
+	}
+
+	ai_will_do = {
+		base = 100
+	}
+}
+
+# Faithful perk - Try to learn your faith's Liturgical Language
+learn_liturgical_language_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	major = yes
+
+	ai_check_interval = 120
+
+	cooldown = { years = 5 }
+	
+	desc = learn_liturgical_language_decision_desc
+
+	is_shown = {
+		faith = { faith_has_liturgical_language = yes }
+		
+		NOT = { knows_liturgical_language = yes }
+		
+		NOT = { any_scheme = { scheme_type = ek_learn_liturgical_language } }
+	}
+
+	effect = {
+		custom_tooltip = starts_ek_learn_liturgical_language_scheme_now
+		trigger_event = ek_learn_liturgical_language_ongoing.0001
+	}
+
+	cost = {
+		piety = {
+			value = minor_piety_value
+		}
+	}
+
+	ai_will_do = {
+		base = 100
+	}
+}
+
+#Champion Conversion
+champion_conversion_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds"
+	major = yes
+	ai_check_interval = 12
+
+	desc = champion_conversion_decision_desc
+	selection_tooltip = champion_conversion_decision_tooltip
+
+	is_shown = {
+		OR = {
+			has_character_flag = vaermina_conversion
+			has_character_flag = sanguine_conversion
+			has_character_flag = hircine_conversion
+			has_character_flag = meridia_conversion
+			has_character_flag = boethiah_conversion
+			has_character_flag = molag_conversion
+			has_character_flag = azura_conversion
+			has_character_flag = clavicus_conversion
+			has_character_flag = mehrunes_conversion
+			has_character_flag = hermaeus_conversion
+			has_character_flag = namira_conversion
+			has_character_flag = sheogorath_conversion
+			has_character_flag = malacath_conversion
+		}
+	}
+
+	is_valid = {
+		is_adult = yes
+	}
+
+	effect = {
+		if = {
+			limit = {
+				has_character_flag = vaermina_conversion
+			}
+			set_character_faith_with_conversion = faith:vaermina_cult
+			remove_character_flag = vaermina_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = sanguine_conversion
+			}
+			set_character_faith_with_conversion = faith:sanguine_cult
+			remove_character_flag = sanguine_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = hircine_conversion
+			}
+			set_character_faith_with_conversion = faith:hircine_cult
+			remove_character_flag = hircine_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = meridia_conversion
+			}
+			set_character_faith_with_conversion = faith:meridia_cult
+			remove_character_flag = meridia_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = boethiah_conversion
+			}
+			set_character_faith_with_conversion = faith:boethiah_cult
+			remove_character_flag = boethiah_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = molag_conversion
+			}
+			set_character_faith_with_conversion = faith:molag_cult
+			remove_character_flag = molag_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = azura_conversion
+			}
+			set_character_faith_with_conversion = faith:azura_cult
+			remove_character_flag = azura_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = clavicus_conversion
+			}
+			set_character_faith_with_conversion = faith:clavicus_cult
+			remove_character_flag = clavicus_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = mehrunes_conversion
+			}
+			set_character_faith_with_conversion = faith:mehrunes_cult
+			remove_character_flag = mehrunes_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = hermaeus_conversion
+			}
+			set_character_faith_with_conversion = faith:hermaeus_cult
+			remove_character_flag = hermaeus_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = namira_conversion
+			}
+			set_character_faith_with_conversion = faith:namira_cult
+			remove_character_flag = namira_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = sheogorath_conversion
+			}
+			set_character_faith_with_conversion = faith:sheogorath_cult
+			remove_character_flag = sheogorath_conversion
+		}
+		if = {
+			limit = {
+				has_character_flag = malacath_conversion
+			}
+			set_character_faith_with_conversion = faith:malacath_cult
+			remove_character_flag = malacath_conversion
+		}
+	}
+
+	ai_potential = {
+		
+	}
+
+	ai_will_do = {
+		base = 0
+		modifier = {
+			add = 20
+			has_trait = cynical
+		}
+	}
+}
+
+# Join the Council of the Eight
+join_cote_decision = {
+	picture = "gfx/interface/illustrations/decisions/decision_personal_religious.dds" 
+
+	desc = join_cote_decision_desc
+	selection_tooltip = join_cote_decision_tt
+
+	major = yes
+	
+	ai_check_interval = 120
+	
+	is_shown = {
+		is_landed = yes
+		faith = {
+			OR = { #is available to faiths that worship the Divines or are otherwise part of the Divines religious sphere
+				has_doctrine = doctrine_pantheon_divines
+				has_doctrine = doctrine_pantheon_nord
+				has_doctrine = doctrine_pantheon_redguard
+				has_doctrine = doctrine_pantheon_nedic_aedra
+				has_doctrine = special_doctrine_cyrodiilic_cult
+			}
+		}
+		faith = {
+			NOT = { exists = religious_head } #unless they already have a HoF, of course
+		}	
+		highest_held_title_tier >= tier_kingdom
+	}	
+
+	is_valid_showing_failures_only = {
+		is_imprisoned = no
+		is_adult = yes
+		is_at_war = no
+	}
+	is_valid = {
+		piety_level >= 3
+		custom_description = { #gotta control a significant part of your faith's adherents
+		 	text = high_enough_ratio_nb_provinces_same_faith_held_provinces_same_faith
+		 	subject = root
+		 	value = 66
+		 	ratio_nb_provinces_same_faith_held_provinces_same_faith >= 66
+		}
+		custom_tooltip = {
+			text = faith_not_considered_evil
+			faith = {
+				NOT = {
+					faith_hostility_level = {
+						target = title:k_council_of_the_eight.holder.faith
+						value >= faith_evil_level
+					}
+				}
+			}
+		}
+    }
+	cost = {
+        piety = 2000
+	}
+	effect =  {
+		if = {
+			limit = {
+				faith = {  #if the faith doesn't have the spiritual head doctrine, we gotta give it to them
+					NOT = { flag:doctrine_spiritual_head = { is_in_list = selected_doctrines }}
+				}	
+			}
+			custom_tooltip = {
+				text = gain_doctrine_spiritual_head
+				faith = { remove_doctrine = doctrine_no_head } #remove all other HoF doctrines to be safe
+				faith = { remove_doctrine = doctrine_temporal_head }
+				faith = { remove_doctrine = doctrine_mystical_birthright_head }
+				faith = { remove_doctrine = doctrine_divine_blood_head }
+				faith = { add_doctrine = doctrine_spiritual_head } #then add the relevant one
+			}
+		}
+		faith = { set_religious_head_title = title:k_council_of_the_eight } #set the HoF to the CotE (gotta do this after giving them the appropriate doctrine)
+		custom_tooltip = {
+			text = join_cote_decision_faith_hostility
+		}
+		trigger_event = {
+			id = ek_religious_decision.1015
+			days = 7
+		}
+	}
+
+	ai_will_do = {
+		base = 40 #let's not have the AI do this too often
+	}
+}	
