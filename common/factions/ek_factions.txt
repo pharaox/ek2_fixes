@@ -802,18 +802,18 @@ crisis_undead_faction = {
 			value = yes
 		}
 
-		scope:crisis_undead_county = {
-			if = {
-				limit = { has_county_modifier = county_corruption_undead_rampant_modifier }
-				remove_undead_rampant_modifier_effect = yes
-			}
-		}
 		if = {
 			limit = { exists = special_character }
 			special_character = {
 				if = {
 					#Verify that the title exists before trying to destroy it
 					limit = { has_variable = crisis_undead_title }
+					var:crisis_undead_title.title_capital_county = {
+						if = {
+							limit = { has_county_modifier = county_corruption_undead_rampant_modifier }
+							remove_undead_rampant_modifier_effect = yes
+						}
+					}
 					destroy_title = this.var:crisis_undead_title
 				}
 
