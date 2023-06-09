@@ -632,13 +632,11 @@ duel_for_claim_strong_interaction = {
 		# If it's your last county, you really don't want to lose it
 		modifier = {
 			desc = DUEL_FOR_CLAIM_LAST_TITLE
-			scope:target = {
-				NOT = {
-					any_realm_county = {
-						save_temporary_scope_as = temp_county
-						NOT = { scope:target = scope:temp_county }
-						NOT = { scope:target = { is_de_jure_liege_or_above_target = scope:temp_county } }
-					}
+			NOT = {
+				any_realm_county = {
+					save_temporary_scope_as = temp_county
+					NOT = { scope:target = scope:temp_county }
+					NOT = { scope:target = { is_de_jure_liege_or_above_target = scope:temp_county } }
 				}
 			}
 			add = 15
