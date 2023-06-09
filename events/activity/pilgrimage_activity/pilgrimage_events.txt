@@ -3907,11 +3907,11 @@ pilgrimage.5921 = {
 scripted_trigger pilgrimage_6001_friend_trigger = {
 	is_available_ai_adult = yes
 	faith = root.faith
-	trigger_if = {
-		### EK EDIT: no islam
-		#limit = { faith.religion = religion:islam_religion }
-		has_trait = drunkard
-	}
+	#trigger_if = {
+	#	### EK EDIT: no islam
+	#	#limit = { faith.religion = religion:islam_religion }
+	#	has_trait = drunkard
+	#}
 }
 
 pilgrimage.6001 = { # Meet a friend on the pilgrimage, shenanigans ensue

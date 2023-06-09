@@ -718,7 +718,7 @@ go_on_pilgrimage_decision = {
 			trigger_event = pilgrimage.0999
 		}
 		### EK EDIT: Trials of Kyne for the Nords who worship her
-		if = {
+		else_if = {
 			limit = { 
 				NOT = { has_character_flag = kyne_trial }
 				has_trait = p_at_hawk
