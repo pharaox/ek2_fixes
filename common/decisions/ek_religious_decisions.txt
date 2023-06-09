@@ -1076,6 +1076,7 @@ recruit_priest_liturgical_language_decision = {
 		}
 		
 		# You must lack a realm priest
+		exists = council_task:councillor_court_chaplain
 		NOT = { exists = cp:councillor_court_chaplain }
 	}
 
