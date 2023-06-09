@@ -753,6 +753,7 @@ ek_pilgrimage.0011 = {
 				name = had_ek_pilgrimage_0011
 				value = yes
 			}
+			activity_province = { save_scope_as = background_terrain_scope }
 		}
 		if = {
 			limit = {
@@ -816,6 +817,16 @@ ek_pilgrimage.0012 = {
 	right_portrait = {
 		character = root
 		scripted_animation = duel_wield_weapon
+	}
+
+	trigger = {
+		exists = scope:activity
+	}
+
+	immediate = {
+		scope:activity = {
+			activity_province = { save_scope_as = background_terrain_scope }
+		}
 	}
 
 	option = { # Kill it! Kill it with fire!
@@ -932,6 +943,7 @@ ek_pilgrimage.0013 = {
 				name = had_ek_pilgrimage_0013
 				value = yes
 			}
+			activity_province = { save_scope_as = background_terrain_scope }
 		}
 		if = {
 			limit = {
@@ -1009,6 +1021,9 @@ ek_pilgrimage.0014 = {
 	}
 
 	immediate = {
+		scope:activity = {
+			activity_province = { save_scope_as = background_terrain_scope }
+		}
 		create_artifact_rilms_shoes_effect = {
 			OWNER = root
 		}
@@ -1075,6 +1090,9 @@ ek_pilgrimage.0015 = {
 	}
 
 	immediate = {
+		scope:activity = {
+			activity_province = { save_scope_as = background_terrain_scope }
+		}
 		create_artifact_aralor_shirt_effect = {
 			OWNER = root
 		}
@@ -1141,6 +1159,9 @@ ek_pilgrimage.0016 = {
 	}
 
 	immediate = {
+		scope:activity = {
+			activity_province = { save_scope_as = background_terrain_scope }
+		}
 		create_artifact_felms_cleaver_effect = {
 			OWNER = root
 		}
@@ -1207,6 +1228,9 @@ ek_pilgrimage.0017 = {
 	}
 
 	immediate = {
+		scope:activity = {
+			activity_province = { save_scope_as = background_terrain_scope }
+		}
 		create_artifact_llothis_crosier_effect = {
 			OWNER = root
 		}

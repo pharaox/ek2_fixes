@@ -3206,6 +3206,10 @@ ek_yearly_events.0050 = {
 		character = scope:missing_friend
 	}
 
+	immediate = {
+		scope:missing_friend.location = { save_scope_as = background_terrain_scope }
+	}
+
 	option = { # i actually wanna lay with you
 		name = ek_yearly_events.0050.a
 		trigger = { 
@@ -3273,6 +3277,7 @@ ek_yearly_events.0051 = {
 	}
 
 	immediate = {
+		scope:missing_friend.location = { save_scope_as = background_terrain_scope }
 		dangerous_animal_effect = { CHARACTER = scope:missing_friend }
 		set_signature_weapon_effect = yes
 		scope:missing_friend = { death = { death_reason = death_eaten } }
