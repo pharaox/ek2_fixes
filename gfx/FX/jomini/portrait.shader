@@ -582,7 +582,7 @@ PixelShader =
 					float3 Lighting = DiffuseIBL + SpecularIBL + DiffuseLight + SpecularLight;
 					Albedo1.rgb = lerp (Albedo1.rgb, Albedo1.rgb * 3.0f, Lighting);
 
-					#ifndef PARALLAX
+					#if !defined(PARALLAX) || defined(PDX_OPENGL)
 						float3 Color = lerp (Albedo1.rgb, Lighting.rgb, 1.0f-GlassMasks.r);
 					#else
 						float3 Color1 = lerp (Albedo1.rgb, Lighting.rgb, 1.0f-GlassMasks.r);
@@ -595,7 +595,7 @@ PixelShader =
 				#endif
 				
 				//EK2 Parallax shader - Based on NIFSCOPE skyrim multi-layer-parallax shader.
-				#ifdef PARALLAX
+				#if defined(PARALLAX) && !defined(PDX_OPENGL)
 
 					static const float OuterRefraction 		= 	0.2f;   //Dictates how smooth the inner texture is. 0.0f not distorted by surface normals, and 1.0f fully distorted by surface normals.
 					static const float NormalSmoothing 		= 	0.0f;   //Reduces the effect of lighting by smoothing normals, 0.0f lights the model as normal, 1.0f gives almost fullbright effect.
