@@ -1,0 +1,1238 @@
+﻿namespace = ek_pilgrimage
+
+# Sermon Reading
+ek_pilgrimage.0001 = {
+	type = character_event
+	title = ek_pilgrimage.0001.t
+	desc = ek_pilgrimage.0001.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	left_portrait = {
+		character = scope:sermon_reader
+		animation = personality_zealous
+		#hide_info = yes
+	}
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0001
+		}
+	}
+
+	immediate = {
+		random_dummy_gender_clergy_effect = yes
+		create_character = {
+			age = {25 55}
+			gender = scope:dummy_clergy_gender
+			location = root.location
+			faith = root.faith
+			culture = root.culture
+			save_scope_as = sermon_reader
+		}
+		#EK EDIT
+		hidden_effect = {
+			scope:sermon_reader = {
+				ek_character_setup_effect = yes
+			}
+		}
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0001
+				value = yes
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0001.a
+		add_piety = minor_piety_gain			
+	}
+
+	option = {
+		trigger = { has_trait = cynical }
+		trait = cynical
+		name = ek_pilgrimage.0001.b
+
+		add_piety = miniscule_piety_loss
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# Wisdom of the Ages
+ek_pilgrimage.0002 = {
+	type = character_event
+	title = ek_pilgrimage.0002.t
+	desc = ek_pilgrimage.0002.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+
+	left_portrait = {
+		character = root
+		animation = personality_zealous
+	}
+
+	lower_right_portrait = {
+		character = character:whitestrake_100
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	artifact = {
+		target = scope:crusader_shield
+		position = lower_left_portrait
+		trigger = { exists = scope:crusader_shield }
+	}
+
+	trigger = {
+		faith = {
+			OR = {
+				has_doctrine = doctrine_pantheon_divines
+				has_doctrine = doctrine_pantheon_heroes
+			}
+		}
+		exists = scope:activity
+		OR = { 
+			has_trait = p_dv_julianos
+			has_trait = p_ch_pelinal
+		}
+		piety_level >= 3
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = crusader_shield_modifier
+		}
+	}
+
+	immediate = {
+		create_artifact_crusader_shield_effect = {
+			OWNER = root
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0002.a
+		stress_impact = {
+			humble = major_stress_impact_gain
+			ambitious = major_stress_impact_loss
+		}			
+	}
+
+	option = {
+		name = ek_pilgrimage.0002.b
+		destroy_artifact = scope:crusader_shield
+		add_piety = major_piety_gain
+		stress_impact = {
+			humble = major_stress_impact_loss
+			ambitious = major_stress_impact_gain
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Bloodstone Shrine
+ek_pilgrimage.0003 = {
+	type = character_event
+	title = ek_pilgrimage.0003.t
+	desc = ek_pilgrimage.0003.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:hetman
+		animation = pain
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0003
+		}
+	}
+
+	immediate = {
+		save_holy_site_for_loc_effect = yes
+		random_dummy_gender_clergy_effect = yes
+		create_character = {
+			age = {25 55}
+			gender = scope:dummy_clergy_gender
+			location = root.location
+			faith = root.faith
+			culture = root.culture
+			save_scope_as = hetman
+		}
+		#EK EDIT
+		hidden_effect = {
+			scope:hetman = {
+				ek_character_setup_effect = yes
+			}
+		}
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0003
+				value = yes
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0003.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			flagellant = major_stress_impact_loss
+		}
+		add_internal_flag = dangerous
+		custom_tooltip = ek_pilgrimage.0003.a.tt
+		trigger_event = {
+			id = ek_pilgrimage.0004
+			days = 5
+		}			
+	}
+
+	option = {
+		name = ek_pilgrimage.0003.b
+		add_piety = major_piety_loss
+		stress_impact = {
+			humble = major_stress_impact_gain
+			brave = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+			deviant = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Bloodstone Shrine
+ek_pilgrimage.0004 = {
+	type = character_event
+	title = ek_pilgrimage.0003.t
+	desc = ek_pilgrimage.0004.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+
+	left_portrait = {
+		character = root
+		animation = pain
+	}
+
+
+	immediate = {
+		save_holy_site_for_loc_effect = yes
+		increase_wounds_no_death_effect = { REASON = flagellant	}
+		add_piety = major_piety_gain
+	}
+
+	option = {
+		name = ek_pilgrimage.0004.a			
+		stress_impact = { zealous = major_stress_impact_gain }
+	}
+
+	option = {
+		trigger = {
+			NOT = {
+				has_trait = flagellant
+			}
+		}
+		name = ek_pilgrimage.0004.b
+		add_piety = major_piety_gain
+		add_trait = flagellant
+	}
+
+	option = {
+		trigger = { has_trait = flagellant }
+		name = ek_pilgrimage.0004.c
+		add_piety = major_piety_gain
+		trait = flagellant
+		stress_impact = {
+			flagellant = major_stress_impact_loss
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Humility
+ek_pilgrimage.0005 = {
+	type = character_event
+	title = ek_pilgrimage.0005.t
+	desc = ek_pilgrimage.0005.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0005
+		}
+	}
+
+	immediate = {
+		save_holy_site_for_loc_effect = yes
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0005
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0005.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+			arrogant = major_stress_impact_gain
+		}
+		remove_short_term_gold = tiny_gold_value
+		add_piety = medium_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0005.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			humble = major_stress_impact_gain
+			brave = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+			deviant = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Daring
+ek_pilgrimage.0006 = {
+	type = character_event
+	title = ek_pilgrimage.0006.t
+	desc = ek_pilgrimage.0006.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = temple }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0006
+		}
+	}
+
+	immediate = {
+		save_holy_site_for_loc_effect = yes
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0006
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0006.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+		}
+		remove_short_term_gold = minor_gold_value
+		add_piety = medium_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0006.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Generosity
+ek_pilgrimage.0007 = {
+	type = character_event
+	title = ek_pilgrimage.0007.t
+	desc = ek_pilgrimage.0007.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = temple }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0007
+		}
+	}
+
+	immediate = {
+		save_holy_site_for_loc_effect = yes
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0007
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0007.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+		}
+		remove_short_term_gold = 100
+		add_piety = medium_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0007.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Courtesy
+ek_pilgrimage.0008 = {
+	type = character_event
+	title = ek_pilgrimage.0008.t
+	desc = ek_pilgrimage.0008.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = temple }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0008
+		}
+	}
+
+	immediate = {
+		save_holy_site_for_loc_effect = yes
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0008
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0008.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			craven = major_stress_impact_gain
+		}
+		add_piety = medium_piety_gain
+		add_internal_flag = dangerous
+		random_list = {
+			70 = {
+				show_as_tooltip = { increase_wounds_effect = { REASON = drowned } }
+				trigger_event = ek_pilgrimage.0009
+				custom_tooltip = ek_pilgrimage.0008.a.tt
+			}
+			30 = {
+				death = { death_reason = death_drowned }
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0008.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			brave = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Courtesy Final
+ek_pilgrimage.0009 = {
+	type = character_event
+	title = ek_pilgrimage.0009.t
+	desc = ek_pilgrimage.0009.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = temple }
+
+	left_portrait = {
+		character = root
+	}
+
+	right_portrait = {
+		character = scope:krazzt
+	}
+
+	immediate = {
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+		create_character = {
+			template = dremora_mehrunes_template
+			location = root.location
+			gender_female_chance = 50
+			save_scope_as = krazzt
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0009.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+		}
+		remove_short_term_gold = minor_gold_value
+		add_piety = major_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0009.b
+		add_piety = minor_piety_gain
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Justice
+ek_pilgrimage.0010 = {
+	type = character_event
+	title = ek_pilgrimage.0010.t
+	desc = ek_pilgrimage.0010.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = temple }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0010
+		}
+	}
+
+	immediate = {
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0010
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0010.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+		}
+		remove_short_term_gold = minor_gold_value
+		add_piety = medium_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0010.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Valor
+ek_pilgrimage.0011 = {
+	type = character_event
+	title = ek_pilgrimage.0011.t
+	desc = ek_pilgrimage.0011.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0011
+		}
+	}
+
+	immediate = {
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0011
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0011.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+		}
+		remove_short_term_gold = minor_gold_value
+		add_piety = medium_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0011.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0011.c
+		stress_impact = {
+			brave = major_stress_impact_loss
+		}
+		custom_tooltip = ek_pilgrimage.0011.c.tt
+		trigger_event = ek_pilgrimage.0012
+	}
+}
+
+# The Pilgrim's Path - Valor: Dreugh Fight
+ek_pilgrimage.0012 = {
+	type = character_event
+	title = ek_pilgrimage.0012.t
+	desc = ek_pilgrimage.0012.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+	
+	right_portrait = {
+		character = root
+		scripted_animation = duel_wield_weapon
+	}
+
+	option = { # Kill it! Kill it with fire!
+		name = ek_pilgrimage.0012.a
+		duel = {
+			skill = prowess
+			value = average_skill_rating
+			10 = {
+				desc = ek_pilgrimage.0012.a.success
+				compare_modifier = {
+					value = scope:duel_value
+					multiplier = 1
+				}
+				send_interface_toast = {
+					left_icon = root
+					type = event_toast_effect_good
+					title = tooltip.ek_pilgrimage.0012.a.success
+					add_prestige = minor_prestige_gain
+					create_artifact_dreugh_cuirass_effect = { OWNER = this }
+					change_variable = {
+						name = pilgrims_path_count
+						add = 1
+					}
+				}
+			}
+			
+			5 = {
+				desc = ek_pilgrimage.0012.a.failure
+				send_interface_toast = {
+					left_icon = root
+					type = event_toast_effect_bad
+					title = tooltip.ek_pilgrimage.0012.a.failure
+					add_prestige = medium_prestige_loss
+					random_list = {
+						5 = {
+							send_interface_toast = {
+								title = ek_pilgrimage.0012.a.failure.death.tt
+								left_icon = root
+								death = { death_reason = death_hunting_accident }
+							}
+						}
+						30 = { 
+							increase_wounds_effect = { REASON = battle }
+						} 
+					} 
+				}
+			}
+		}
+
+		stress_impact = {
+			brave = minor_stress_impact_loss
+			craven = minor_stress_impact_gain
+		}
+		
+		ai_chance = {
+			base = 100
+			ai_value_modifier = {
+				ai_zeal = -0.5
+			}
+		}
+	}
+
+	option = { # Run as fast as you can
+		name = ek_pilgrimage.0012.b
+		custom_tooltip = ek_pilgrimage.0012.b.tt
+		stress_impact = {
+			craven = minor_stress_impact_loss
+			brave = minor_stress_impact_gain
+		}
+		
+		ai_chance = {
+			base = 100
+			ai_value_modifier = {
+				ai_boldness = -0.5
+			}
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# The Pilgrim's Path - Pride
+ek_pilgrimage.0013 = {
+	type = character_event
+	title = ek_pilgrimage.0013.t
+	desc = ek_pilgrimage.0013.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		NOT = {
+			exists = scope:activity.var:had_ek_pilgrimage_0013
+		}
+	}
+
+	immediate = {
+		scope:activity = {
+			set_variable = {
+				name = had_ek_pilgrimage_0013
+				value = yes
+			}
+		}
+		if = {
+			limit = {
+				NOT = {
+					exists = var:pilgrims_path_count
+				}
+			}
+			set_variable = {
+				name = pilgrims_path_count
+				value = 0
+			}
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0013.a
+		stress_impact = {
+			cynical = major_stress_impact_gain
+			greedy = major_stress_impact_gain
+		}
+		remove_short_term_gold = minor_gold_value
+		add_piety = medium_piety_gain
+		change_variable = {
+			name = pilgrims_path_count
+			add = 1
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+
+	option = {
+		name = ek_pilgrimage.0010.b
+		add_piety = minor_piety_loss
+		stress_impact = {
+			ambitious = major_stress_impact_gain
+			zealous = major_stress_impact_gain
+		}
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# Rilms' Grace
+ek_pilgrimage.0014 = {
+	type = character_event
+	title = ek_pilgrimage.0014.t
+	desc = ek_pilgrimage.0014.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	artifact = {
+		target = scope:rilms_shoes
+		position = lower_left_portrait
+		trigger = { exists = scope:rilms_shoes }
+	}
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		piety_level >= 3
+		has_any_patron_saint = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = rilms_shoes_modifier
+		}
+	}
+
+	immediate = {
+		create_artifact_rilms_shoes_effect = {
+			OWNER = root
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0014.a
+		add_trait = p_vl_rilms
+		stress_impact = {
+			humble = major_stress_impact_gain
+			ambitious = major_stress_impact_loss
+		}			
+	}
+
+	option = {
+		name = ek_pilgrimage.0014.b
+		destroy_artifact = scope:rilms_shoes
+		add_piety = major_piety_gain
+		stress_impact = {
+			humble = major_stress_impact_loss
+			ambitious = major_stress_impact_gain
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# Aralor's Intervention
+ek_pilgrimage.0015 = {
+	type = character_event
+	title = ek_pilgrimage.0015.t
+	desc = ek_pilgrimage.0015.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	artifact = {
+		target = scope:aralor_shirt
+		position = lower_left_portrait
+		trigger = { exists = scope:aralor_shirt }
+	}
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		piety_level >= 3
+		has_any_patron_saint = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = aralor_shirt_modifier
+		}
+	}
+
+	immediate = {
+		create_artifact_aralor_shirt_effect = {
+			OWNER = root
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0015.a
+		add_trait = p_vl_aralor
+		stress_impact = {
+			humble = major_stress_impact_gain
+			ambitious = major_stress_impact_loss
+		}			
+	}
+
+	option = {
+		name = ek_pilgrimage.0015.b
+		destroy_artifact = scope:aralor_shirt
+		add_piety = major_piety_gain
+		stress_impact = {
+			humble = major_stress_impact_loss
+			ambitious = major_stress_impact_gain
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# Felms's Glory
+ek_pilgrimage.0016 = {
+	type = character_event
+	title = ek_pilgrimage.0016.t
+	desc = ek_pilgrimage.0016.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	artifact = {
+		target = scope:felms_cleaver
+		position = lower_left_portrait
+		trigger = { exists = scope:felms_cleaver }
+	}
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		piety_level >= 3
+		has_any_patron_saint = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = felms_cleaver_modifier
+		}
+	}
+
+	immediate = {
+		create_artifact_felms_cleaver_effect = {
+			OWNER = root
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0016.a
+		add_trait = p_vl_felms
+		stress_impact = {
+			humble = major_stress_impact_gain
+			ambitious = major_stress_impact_loss
+		}			
+	}
+
+	option = {
+		name = ek_pilgrimage.0016.b
+		destroy_artifact = scope:felms_cleaver
+		add_piety = major_piety_gain
+		stress_impact = {
+			humble = major_stress_impact_loss
+			ambitious = major_stress_impact_gain
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
+# Rock of Llothis
+ek_pilgrimage.0017 = {
+	type = character_event
+	title = ek_pilgrimage.0017.t
+	desc = ek_pilgrimage.0017.desc
+	theme = pilgrimage_activity
+	override_icon = {
+		reference = "gfx/interface/icons/event_types/type_faith.dds"
+	}
+	override_background = { event_background = terrain_scope }
+
+	left_portrait = {
+		character = root
+	}
+
+	cooldown = { years = yearly_cooldown }
+
+	artifact = {
+		target = scope:llothis_crosier
+		position = lower_left_portrait
+		trigger = { exists = scope:llothis_crosier }
+	}
+
+	trigger = {
+		faith = {
+			has_doctrine = doctrine_pantheon_tribunal
+		}
+		exists = scope:activity
+		piety_level >= 3
+		has_any_patron_saint = no
+		any_artifact = {
+			count < 1
+			has_artifact_modifier = llothis_crosier_modifier
+		}
+	}
+
+	immediate = {
+		create_artifact_llothis_crosier_effect = {
+			OWNER = root
+		}
+	}
+
+	option = {
+		name = ek_pilgrimage.0017.a
+		add_trait = p_vl_llothis
+		stress_impact = {
+			humble = major_stress_impact_gain
+			ambitious = major_stress_impact_loss
+		}			
+	}
+
+	option = {
+		name = ek_pilgrimage.0017.b
+		destroy_artifact = scope:llothis_crosier
+		add_piety = major_piety_gain
+		stress_impact = {
+			humble = major_stress_impact_loss
+			ambitious = major_stress_impact_gain
+		}
+	}
+
+	after = {
+		set_up_next_pilgrimage_event_effect = { DAYS = 30 }
+	}
+}
+
