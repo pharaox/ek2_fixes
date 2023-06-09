@@ -17,6 +17,8 @@
  emperor:0 "High King"
  emperor_female:0 "High Queen"
  empire:0 "High Kingdom"
+ count_no_title_male:0 ""
+ count_no_title_female:0 ""
 
  baron_plural:0 "Lords"
  count_plural:0 "Barons"

@@ -154,6 +154,10 @@
  grahti_collective_noun:0 "Grahti"
  grahti_prefix:0 "Grahto"
 
+ graymire_name:0 "Graymire" #Graymire Hleel
+ graymire_collective_noun:0 "Graymire"
+ graymire_prefix:0 "Graymir"
+
  morathi_name:0 "Morathi" #impossible since there's already a Bosmeri culture native to Greenshade
  morathi_collective_noun:0 "Morathi"
  morathi_prefix:0 "Moratho"

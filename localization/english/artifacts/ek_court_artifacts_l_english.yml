@@ -570,6 +570,7 @@
  artifact_wall_animal_skull_alit:0 "a ferocious alit"
  feature_animal_skull_type_alit:0 "a ferocious alit"
  animal_type_kwama_warrior:0 "kwama warrior"
+ animal_type_giant_wasp:0 "giant wasp"
 
  decoration_material_inlay_HSB_mudcrabshell:0 "mudcrab shell"
  feature_decoration_material_inlay_HSB_mudcrabshell:0 "mudcrab shell"
