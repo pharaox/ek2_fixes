@@ -2133,7 +2133,7 @@ ai_make_concubine_interaction = {
 			scope:recipient = {
 				can_have_children_with = { CHARACTER = scope:actor } # Only if you can have kids since this is about fertility and genetic traits
 				fertility > 0.2
-				age < 36
+				ek_human_age_equivalent < 36
 			}
 		}
 		
@@ -2151,7 +2151,7 @@ ai_make_concubine_interaction = {
 					limit = {
 						is_female = yes
 					}
-					age < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
+					ek_human_age_equivalent < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
 				}
 			}
 		}
@@ -2557,7 +2557,7 @@ offer_concubine = {
 					limit = {
 						is_female = yes
 					}
-					age < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
+					ek_human_age_equivalent < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
 				}
 			}
 			desc = AI_POSITIVE_TRAIT_REASON
@@ -2573,7 +2573,7 @@ offer_concubine = {
 					limit = {
 						is_female = yes
 					}
-					age < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
+					ek_human_age_equivalent < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
 				}
 			}
 			desc = AI_DYNASTY_PRESTIGE_REASON_NOBLE
@@ -2592,7 +2592,7 @@ offer_concubine = {
 					limit = {
 						is_female = yes
 					}
-					age < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
+					ek_human_age_equivalent < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
 				}
 			}
 			desc = AI_NEGATIVE_TRAIT_REASON
@@ -2609,7 +2609,7 @@ offer_concubine = {
 					limit = {
 						is_female = yes
 					}
-					age < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
+					ek_human_age_equivalent < define:NChildbirth|MAX_FEMALE_REPRODUCTION_AGE
 				}
 			}
 			desc = AI_DYNASTY_PRESTIGE_REASON_LOWBORN_NO_POSITIVE_TRAIT
@@ -2632,12 +2632,12 @@ offer_concubine = {
 		compare_modifier = { # Recipient is reluctant to marry old women (procreation is a key factor)
 			trigger = {
 				scope:secondary_actor = {
-					age > 29
+					ek_human_age_equivalent > 29
 					is_female = yes
 				}
 			}
 			target = scope:secondary_actor
-			value = age
+			value = ek_human_age_equivalent
 			multiplier = -5.0
 			step = 1
 			offset = -29
@@ -2905,7 +2905,7 @@ offer_concubine = {
 					sex_opposite_of = scope:recipient
 				}
 				fertility > 0.2
-				age < 36
+				ek_human_age_equivalent < 36
 				NOR = {
 					is_councillor_of = scope:actor
 					is_of_major_interest_trigger = {
@@ -2958,7 +2958,7 @@ offer_concubine = {
 			}
 			scope:secondary_actor = {
 				fertility > 0.2
-				age < 36
+				ek_human_age_equivalent < 36
 				OR = {
 					has_trait = lustful
 					num_of_good_genetic_traits > 0
