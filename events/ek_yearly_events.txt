@@ -2898,9 +2898,9 @@ ek_yearly_events.0045 = {
 		name = ek_yearly_events.0045.b
 		add_prestige = minor_prestige_gain
 		scope:hide_robbed = {
-			reverse_add_opinion = {
+			add_opinion = {
 				modifier = disappointed_opinion
-				target = root.liege
+				target = root
 				opinion = -30
 			}
 		}
@@ -3754,9 +3754,9 @@ ek_yearly_events.0055 = {
 			name = ek_yearly_events.0055.b
 			add_prestige = minor_prestige_gain
 			scope:hide_robbed_tribal = {
-				reverse_add_opinion = {
+				add_opinion = {
 						modifier = disappointed_opinion
-						target = root.liege
+						target = root
 						opinion = -30
 				}
 			}
