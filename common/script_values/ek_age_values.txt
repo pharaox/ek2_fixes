@@ -1,0 +1,29 @@
+﻿ek_human_age_equivalent_plus_5 = {
+	value = ek_human_age_equivalent
+	add = 5
+}
+
+ek_human_age_equivalent_plus_10 = {
+	value = ek_human_age_equivalent
+	add = 10
+}
+
+ek_human_age_equivalent_plus_25 = {
+	value = ek_human_age_equivalent
+	add = 25
+}
+
+ek_human_age_equivalent_minus_5 = {
+	value = ek_human_age_equivalent
+	subtract = 5
+}
+
+ek_human_age_equivalent_minus_10 = {
+	value = ek_human_age_equivalent
+	subtract = 10
+}
+
+ek_human_age_equivalent_minus_25 = {
+	value = ek_human_age_equivalent
+	subtract = 25
+}
